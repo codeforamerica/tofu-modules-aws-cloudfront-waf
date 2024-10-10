@@ -11,7 +11,7 @@ to match your desired configuration. For example, to create a new distribution
 
 ```hcl
 module "cloudfront_waf" {
-  source = "github.com/codeforamerica/tofu-modules/aws/cloudfront_waf"
+  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf"
 
   project     = "my-project"
   environment = "dev"
@@ -81,7 +81,7 @@ resource "aws_wafv2_ip_set" "security_scanners" {
 }
 
 module "cloudfront_waf" {
-  source = "github.com/codeforamerica/tofu-modules/aws/cloudfront_waf"
+  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf"
 
   project     = "my-project"
   environment = "staging"
