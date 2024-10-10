@@ -1,5 +1,7 @@
 # CloudFront WAF Module
 
+[![Main Checks](https://github.com/codeforamerica/tofu-modules-aws-cloudfront-waf/actions/workflows/main.yaml/badge.svg)](https://github.com/codeforamerica/tofu-modules-aws-cloudfront-waf/actions/workflows/main.yaml) ![GitHub Release](https://img.shields.io/github/v/release/codeforamerica/tofu-modules-aws-cloudfront-waf?logo=github&label=Latest%20Release)
+
 This module creates a CloudFront [distribution] that passes traffic through a
 Web Application Firewall (WAF) _without_ caching.
 
