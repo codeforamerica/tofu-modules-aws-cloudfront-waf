@@ -51,16 +51,18 @@ jobs:
       - name: Get the version from the commit message
         id: version
         uses: actions/github-script@v7
+        env:
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
         with:
           result-encoding: string
           # Look for the last version number, expecting it to be in the format:
           # `#.#.#-<suffix>.#` where the suffix is optional.
           script: |
-            const message = '${{ github.event.head_commit.message }}'
-            const regex = /^bump:.+(?<version>\d+\.\d+\.\d+[\da-z.-]*) \(#\d+\)$/
-            const version = message.match(regex).groups.version
-            console.log(version)
-            return version
+            const message = process.env.COMMIT_MESSAGE;
+            const regex = /^bump:.+(?<version>\d+\.\d+\.\d+[\da-z.-]*) \(#\d+\)$/m;
+            const version = message.match(regex).groups.version;
+            console.log(version);
+            return version;
       - name: Bundle the module
         # We create an empty file first, so that tar doesn't complain about the
         # contents changing while it's running.
@@ -72,6 +74,7 @@ jobs:
             --exclude='.github' \
             --exclude='.cz.yaml' \
             --exclude='*.tar.gz' \
+            --exclude='*.tfvars' \
             --exclude='release.md' \
             --exclude='CODEOWNERS' \
             --exclude='trivy.yaml' \
