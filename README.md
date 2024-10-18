@@ -84,7 +84,7 @@ resource "aws_wafv2_ip_set" "security_scanners" {
 }
 
 module "cloudfront_waf" {
-  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf"
+  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.1.0"
 
   project     = "my-project"
   environment = "staging"
