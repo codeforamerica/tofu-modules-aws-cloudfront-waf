@@ -161,10 +161,15 @@ resource "aws_wafv2_web_acl" "waf" {
     name     = "AWS-AWSManagedRulesAmazonIpReputationList"
     priority = 200
 
-    dynamic "override_action" {
-      for_each = var.passive_mode ? [true] : []
-      content {
-        count {}
+    override_action {
+      dynamic "none" {
+        for_each = var.passive ? [] : [true]
+        content { }
+      }
+
+      dynamic "count" {
+        for_each = var.passive ? [true] : []
+        content { }
       }
     }
 
@@ -186,10 +191,15 @@ resource "aws_wafv2_web_acl" "waf" {
     name     = "AWS-AWSManagedRulesCommonRuleSet"
     priority = 300
 
-    dynamic "override_action" {
-      for_each = var.passive_mode ? [true] : []
-      content {
-        count {}
+    override_action {
+      dynamic "none" {
+        for_each = var.passive ? [] : [true]
+        content { }
+      }
+
+      dynamic "count" {
+        for_each = var.passive ? [true] : []
+        content { }
       }
     }
 
@@ -211,10 +221,15 @@ resource "aws_wafv2_web_acl" "waf" {
     name     = "AWS-AWSManagedRulesKnownBadInputsRuleSet"
     priority = 400
 
-    dynamic "override_action" {
-      for_each = var.passive_mode ? [true] : []
-      content {
-        count {}
+    override_action {
+      dynamic "none" {
+        for_each = var.passive ? [] : [true]
+        content { }
+      }
+
+      dynamic "count" {
+        for_each = var.passive ? [true] : []
+        content { }
       }
     }
 
@@ -236,10 +251,15 @@ resource "aws_wafv2_web_acl" "waf" {
     name     = "AWS-AWSManagedRulesSQLiRuleSet"
     priority = 500
 
-    dynamic "override_action" {
-      for_each = var.passive_mode ? [true] : []
-      content {
-        count {}
+    override_action {
+      dynamic "none" {
+        for_each = var.passive ? [] : [true]
+        content { }
+      }
+
+      dynamic "count" {
+        for_each = var.passive ? [true] : []
+        content { }
       }
     }
 

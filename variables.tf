@@ -25,7 +25,7 @@ variable "origin_domain" {
   default     = ""
 }
 
-variable "passive_mode" {
+variable "passive" {
   type        = bool
   description = "Enable passive mode for the WAF, counting all requests rather than blocking."
   default     = false
