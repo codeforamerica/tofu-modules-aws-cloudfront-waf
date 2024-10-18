@@ -113,7 +113,7 @@ resource "aws_wafv2_web_acl" "waf" {
           content {}
         }
 
-        dynamic "block" {
+        dynamic "count" {
           for_each = rule.value.action == "count" ? [true] : []
           content {}
         }
@@ -133,6 +133,7 @@ resource "aws_wafv2_web_acl" "waf" {
     }
   }
 
+  # TODO: Make rate-limiting configurable.
   rule {
     name     = "AWS-RateBasedRule-IP-300"
     priority = 100
@@ -161,7 +162,15 @@ resource "aws_wafv2_web_acl" "waf" {
     priority = 200
 
     override_action {
-      none {}
+      dynamic "none" {
+        for_each = var.passive ? [] : [true]
+        content { }
+      }
+
+      dynamic "count" {
+        for_each = var.passive ? [true] : []
+        content { }
+      }
     }
 
     statement {
@@ -183,7 +192,15 @@ resource "aws_wafv2_web_acl" "waf" {
     priority = 300
 
     override_action {
-      none {}
+      dynamic "none" {
+        for_each = var.passive ? [] : [true]
+        content { }
+      }
+
+      dynamic "count" {
+        for_each = var.passive ? [true] : []
+        content { }
+      }
     }
 
     statement {
@@ -205,7 +222,15 @@ resource "aws_wafv2_web_acl" "waf" {
     priority = 400
 
     override_action {
-      none {}
+      dynamic "none" {
+        for_each = var.passive ? [] : [true]
+        content { }
+      }
+
+      dynamic "count" {
+        for_each = var.passive ? [true] : []
+        content { }
+      }
     }
 
     statement {
@@ -227,7 +252,15 @@ resource "aws_wafv2_web_acl" "waf" {
     priority = 500
 
     override_action {
-      none {}
+      dynamic "none" {
+        for_each = var.passive ? [] : [true]
+        content { }
+      }
+
+      dynamic "count" {
+        for_each = var.passive ? [true] : []
+        content { }
+      }
     }
 
     statement {

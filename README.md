@@ -58,6 +58,7 @@ these rules are spaced out to allow for custom rules to be inserted between.
 | [ip_set_rules] | The environment for the project.                                                                    | `map(object)`  | `"dev"` | no       |
 | log_group      | CloudWatch log group to send WAF logs to.                                                           | `list(string)` | `[]`    | no       |
 | origin_domain  | Fully qualified domain name for the origin. Defaults to `origin.${subdomain}.${domain}`.            | `string`       | n/a     | no       |
+| passive        | Enable passive mode for the WAF, counting all requests rather than blocking.                        | `bool`         | `false` | no       |
 | subdomain      | Subdomain for the distribution. Defaults to the environment.                                        | `string`       | n/a     | no       |
 | tags           | Optional tags to be applied to all resources.                                                       | `list`         | `[]`    | no       |
 
