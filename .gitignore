@@ -38,3 +38,7 @@ terraform.rc
 # Ignore release artifacts
 release.md
 /*.tar.gz
+
+# Ignore IDE settings
+.idea/
+*.iml
