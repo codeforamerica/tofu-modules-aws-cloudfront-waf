@@ -113,7 +113,7 @@ resource "aws_wafv2_web_acl" "waf" {
           content {}
         }
 
-        dynamic "block" {
+        dynamic "count" {
           for_each = rule.value.action == "count" ? [true] : []
           content {}
         }
@@ -133,6 +133,7 @@ resource "aws_wafv2_web_acl" "waf" {
     }
   }
 
+  # TODO: Make rate-limiting configurable.
   rule {
     name     = "AWS-RateBasedRule-IP-300"
     priority = 100
@@ -160,8 +161,11 @@ resource "aws_wafv2_web_acl" "waf" {
     name     = "AWS-AWSManagedRulesAmazonIpReputationList"
     priority = 200
 
-    override_action {
-      none {}
+    dynamic "override_action" {
+      for_each = var.passive_mode ? [true] : []
+      content {
+        count {}
+      }
     }
 
     statement {
@@ -182,8 +186,11 @@ resource "aws_wafv2_web_acl" "waf" {
     name     = "AWS-AWSManagedRulesCommonRuleSet"
     priority = 300
 
-    override_action {
-      none {}
+    dynamic "override_action" {
+      for_each = var.passive_mode ? [true] : []
+      content {
+        count {}
+      }
     }
 
     statement {
@@ -204,8 +211,11 @@ resource "aws_wafv2_web_acl" "waf" {
     name     = "AWS-AWSManagedRulesKnownBadInputsRuleSet"
     priority = 400
 
-    override_action {
-      none {}
+    dynamic "override_action" {
+      for_each = var.passive_mode ? [true] : []
+      content {
+        count {}
+      }
     }
 
     statement {
@@ -226,8 +236,11 @@ resource "aws_wafv2_web_acl" "waf" {
     name     = "AWS-AWSManagedRulesSQLiRuleSet"
     priority = 500
 
-    override_action {
-      none {}
+    dynamic "override_action" {
+      for_each = var.passive_mode ? [true] : []
+      content {
+        count {}
+      }
     }
 
     statement {
