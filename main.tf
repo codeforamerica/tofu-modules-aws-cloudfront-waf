@@ -138,9 +138,7 @@ resource "aws_wafv2_web_acl" "waf" {
     for_each = var.rate_limit_rules
     content {
       name     = rule.value.name != "" ? rule.value.name : "${local.prefix}-rate-${rule.key}"
-      priority = rule.value.priority != null
-        ? rule.value.priority
-        : index(var.ip_set_rules, rule.key) + length(var.ip_set_rules)
+      priority = rule.value.priority != null ? rule.value.priority : index(var.ip_set_rules, rule.key) + length(var.ip_set_rules)
 
       action {
         dynamic "allow" {
@@ -182,12 +180,12 @@ resource "aws_wafv2_web_acl" "waf" {
     override_action {
       dynamic "none" {
         for_each = var.passive ? [] : [true]
-        content { }
+        content {}
       }
 
       dynamic "count" {
         for_each = var.passive ? [true] : []
-        content { }
+        content {}
       }
     }
 
@@ -212,12 +210,12 @@ resource "aws_wafv2_web_acl" "waf" {
     override_action {
       dynamic "none" {
         for_each = var.passive ? [] : [true]
-        content { }
+        content {}
       }
 
       dynamic "count" {
         for_each = var.passive ? [true] : []
-        content { }
+        content {}
       }
     }
 
@@ -242,12 +240,12 @@ resource "aws_wafv2_web_acl" "waf" {
     override_action {
       dynamic "none" {
         for_each = var.passive ? [] : [true]
-        content { }
+        content {}
       }
 
       dynamic "count" {
         for_each = var.passive ? [true] : []
-        content { }
+        content {}
       }
     }
 
@@ -272,12 +270,12 @@ resource "aws_wafv2_web_acl" "waf" {
     override_action {
       dynamic "none" {
         for_each = var.passive ? [] : [true]
-        content { }
+        content {}
       }
 
       dynamic "count" {
         for_each = var.passive ? [true] : []
-        content { }
+        content {}
       }
     }
 
