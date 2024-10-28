@@ -47,6 +47,17 @@ variable "ip_set_rules" {
   default     = {}
 }
 
+variable "rate_limit_rules" {
+  type = map(object({
+    name = optional(string, "")
+    window = optional(number, 300)
+    action = optional(string, "allow")
+    limit = optional(number, 300)
+  }))
+  description = "Rate limiting configuration for the WAF."
+  default     = {}
+}
+
 variable "subdomain" {
   type        = string
   description = "Subdomain used for this deployment. Defaults to the environment."
