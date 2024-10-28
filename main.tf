@@ -127,7 +127,7 @@ resource "aws_wafv2_web_acl" "waf" {
 
       visibility_config {
         cloudwatch_metrics_enabled = true
-        metric_name                = "${local.prefix}-ip-${rule.key}"
+        metric_name                = "${local.prefix}-waf-ip-${rule.key}"
         sampled_requests_enabled   = true
       }
     }
@@ -167,7 +167,7 @@ resource "aws_wafv2_web_acl" "waf" {
 
       visibility_config {
         cloudwatch_metrics_enabled = true
-        metric_name                = "${local.prefix}-rate-${rule.key}"
+        metric_name                = "${local.prefix}-waf-rate-${rule.key}"
         sampled_requests_enabled   = true
       }
     }

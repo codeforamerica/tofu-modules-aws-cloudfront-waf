@@ -43,7 +43,7 @@ variable "ip_set_rules" {
     priority = optional(number, null)
     arn      = string
   }))
-  description = "Custom WAF rules to apply to the CloudFront distribution."
+  description = "Custom IP Set rules for the WAF."
   default     = {}
 }
 
@@ -61,7 +61,7 @@ variable "rate_limit_rules" {
 
 variable "subdomain" {
   type        = string
-  description = "Subdomain used for this deployment. Defaults to the environment."
+  description = "Subdomain for the distribution. Defaults to the environment."
   default     = ""
 }
 
