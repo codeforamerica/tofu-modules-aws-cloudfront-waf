@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 1.2.0 (2024-10-29)
+
+### Feat
+
+- Added rate limiting configuration. (#8)
+
+### Fix
+
+- Updated metric names.
+docs: Added documentation for `ip_set_rules` and `rate_limit_rules`.
+
 ## 1.1.0 (2024-10-18)
 
 ### Feat
