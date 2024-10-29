@@ -50,9 +50,9 @@ variable "ip_set_rules" {
 variable "rate_limit_rules" {
   type = map(object({
     name     = optional(string, "")
-    action   = optional(string, "allow")
-    limit    = optional(number, 300)
-    window   = optional(number, 300)
+    action   = optional(string, "block")
+    limit    = optional(number, 10)
+    window   = optional(number, 60)
     priority = optional(number, null)
   }))
   description = "Rate limiting configuration for the WAF."

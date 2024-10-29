@@ -49,18 +49,22 @@ these rules are spaced out to allow for custom rules to be inserted between.
 
 ## Inputs
 
-| Name           | Description                                                                                         | Type           | Default | Required |
-|----------------|-----------------------------------------------------------------------------------------------------|----------------|---------|----------|
-| domain         | Primary domain for the distribution. The hosted zone for this domain should be in the same account. | `string`       | n/a     | yes      |
-| log_bucket     | Domain name of the S3 bucket to send logs to.                                                       | `string`       | n/a     | yes      |
-| project        | The name of the project.                                                                            | `string`       | n/a     | yes      |
-| environment    | The environment for the project.                                                                    | `string`       | `"dev"` | no       |
-| [ip_set_rules] | The environment for the project.                                                                    | `map(object)`  | `"dev"` | no       |
-| log_group      | CloudWatch log group to send WAF logs to.                                                           | `list(string)` | `[]`    | no       |
-| origin_domain  | Fully qualified domain name for the origin. Defaults to `origin.${subdomain}.${domain}`.            | `string`       | n/a     | no       |
-| passive        | Enable passive mode for the WAF, counting all requests rather than blocking.                        | `bool`         | `false` | no       |
-| subdomain      | Subdomain for the distribution. Defaults to the environment.                                        | `string`       | n/a     | no       |
-| tags           | Optional tags to be applied to all resources.                                                       | `list`         | `[]`    | no       |
+> [!WARNING]
+> **This is an early release, and the API is subject to change until `v1.0.0`.**
+
+| Name               | Description                                                                                         | Type          | Default | Required |
+|--------------------|-----------------------------------------------------------------------------------------------------|---------------|---------|----------|
+| domain             | Primary domain for the distribution. The hosted zone for this domain should be in the same account. | `string`      | n/a     | yes      |
+| log_bucket         | Domain name of the S3 bucket to send logs to.                                                       | `string`      | n/a     | yes      |
+| log_group          | CloudWatch log group to send WAF logs to.                                                           | `string`      | n/a     | yes      |
+| project            | Project that these resources are supporting.                                                        | `string`      | n/a     | yes      |
+| environment        | The environment for the deployment.                                                                 | `string`      | `"dev"` | no       |
+| [ip_set_rules]     | Custom IP Set rules for the WAF                                                                     | `map(object)` | `{}`    | no       |
+| [rate_limit_rules] | Rate limiting configuration for the WAF.                                                            | `map(object)` | `{}`    | no       |
+| origin_domain      | Fully qualified domain name for the origin. Defaults to `origin.${subdomain}.${domain}`.            | `string`      | n/a     | no       |
+| passive            | Enable passive mode for the WAF, counting all requests rather than blocking.                        | `bool`        | `false` | no       |
+| subdomain          | Subdomain for the distribution. Defaults to the environment.                                        | `string`      | n/a     | no       |
+| tags               | Optional tags to be applied to all resources.                                                       | `map(string)` | `{}`    | no       |
 
 ### ip_set_rules
 
@@ -102,10 +106,56 @@ module "cloudfront_waf" {
 }
 ```
 
+| Name     | Description                                                                   | Type     | Default   | Required |
+|----------|-------------------------------------------------------------------------------|----------|-----------|----------|
+| action   | The action to perform.                                                        | `string` | `"allow"` | no       |
+| arn      | ARN of the IP set to match on.                                                | `string` | n/a       | yes      |
+| name     | Name for this rule. Defaults to `${project}-${environment}-rate-${rule.key}`. | `string` | `""`      | no       |
+| priority | Rule priority. Defaults to the rule's position in the map.                    | `number` | `nil`     | no       |
+
+### rate_limit_rules
+
+To rate limit traffic based on IP address, you can specify a map of rate limit
+rules to create. The rate limit rules are applied in the order they are defined,
+or though the `priority` field.
+
+> _Note: Rate limit rules are added after all IP set rules by default. Use
+> `priority` to order your rules if you need more control._
+
+For example, to rate limit requests to 300 over a 5-minute period:
+
+```hcl
+module "cloudfront_waf" {
+  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.1.0"
+
+  project     = "my-project"
+  environment = "staging"
+  domain      = "my-project.org"
+  log_bucket  = module.logging.bucket
+
+  rate_limit_rules = {
+    limit = {
+      name = "my-project-staging-rate-limit"
+      action = "block"
+      limit = 500
+      window = 500
+    }
+  }
+}
+```
+
+| Name     | Description                                                                             | Type     | Default   | Required |
+|----------|-----------------------------------------------------------------------------------------|----------|-----------|----------|
+| action   | The action to perform.                                                                  | `string` | `"block"` | no       |
+| name     | Name for this rule. Defaults to `${project}-${environment}-rate-${rule.key}`.           | `string` | `""`      | no       |
+| limit    | The number of requests allowed within the window. Minimum value of 10.                  | `number` | `10`      | no       |
+| priority | Rule priority. Defaults to the rule's position in the map + the number of IP set rules. | `number` | `nil`     | no       |
+| window   | Number of seconds to limit requests in. Options are: 60, 120, 300, 600                  | `number` | `60`      | no       |
 
 [distribution]: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/distribution-working-with.html
 [ip-rules]: https://docs.aws.amazon.com/waf/latest/developerguide/waf-rule-statement-type-ipset-match.html
 [ip_set_rules]: #ip_set_rules
+[rate_limit_rules]: #rate_limit_rules
 [rules-common]: https://docs.aws.amazon.com/waf/latest/developerguide/aws-managed-rule-groups-baseline.html#aws-managed-rule-groups-baseline-crs
 [rules-inputs]: https://docs.aws.amazon.com/waf/latest/developerguide/aws-managed-rule-groups-baseline.html#aws-managed-rule-groups-baseline-known-bad-inputs
 [rules-ip-rep]: https://docs.aws.amazon.com/waf/latest/developerguide/aws-managed-rule-groups-ip-rep.html#aws-managed-rule-groups-ip-rep-amazon
