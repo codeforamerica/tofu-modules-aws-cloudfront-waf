@@ -15,7 +15,6 @@ and this project adheres to
 ### Fix
 
 - Updated metric names.
-docs: Added documentation for `ip_set_rules` and `rate_limit_rules`.
 
 ## 1.1.0 (2024-10-18)
 
