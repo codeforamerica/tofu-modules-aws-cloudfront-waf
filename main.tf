@@ -127,33 +127,49 @@ resource "aws_wafv2_web_acl" "waf" {
 
       visibility_config {
         cloudwatch_metrics_enabled = true
-        metric_name                = "${local.prefix}-${rule.key}"
+        metric_name                = "${local.prefix}-waf-ip-${rule.key}"
         sampled_requests_enabled   = true
       }
     }
   }
 
-  # TODO: Make rate-limiting configurable.
-  rule {
-    name     = "AWS-RateBasedRule-IP-300"
-    priority = 100
+  # For each rate-limiting rule, create a rule with the appropriate action.
+  dynamic "rule" {
+    for_each = var.rate_limit_rules
+    content {
+      name     = rule.value.name != "" ? rule.value.name : "${local.prefix}-rate-${rule.key}"
+      priority = rule.value.priority != null ? rule.value.priority : index(var.ip_set_rules, rule.key) + length(var.ip_set_rules)
 
-    action {
-      count {}
-    }
+      action {
+        dynamic "allow" {
+          for_each = rule.value.action == "allow" ? [true] : []
+          content {}
+        }
 
-    statement {
-      rate_based_statement {
-        aggregate_key_type    = "IP"
-        evaluation_window_sec = 300
-        limit                 = 300
+        dynamic "block" {
+          for_each = rule.value.action == "block" ? [true] : []
+          content {}
+        }
+
+        dynamic "count" {
+          for_each = rule.value.action == "count" ? [true] : []
+          content {}
+        }
       }
-    }
 
-    visibility_config {
-      cloudwatch_metrics_enabled = true
-      metric_name                = "${local.prefix}-waf-rate-limit"
-      sampled_requests_enabled   = true
+      statement {
+        rate_based_statement {
+          aggregate_key_type    = "IP"
+          evaluation_window_sec = rule.value.window
+          limit                 = rule.value.limit
+        }
+      }
+
+      visibility_config {
+        cloudwatch_metrics_enabled = true
+        metric_name                = "${local.prefix}-waf-rate-${rule.key}"
+        sampled_requests_enabled   = true
+      }
     }
   }
 
@@ -164,12 +180,12 @@ resource "aws_wafv2_web_acl" "waf" {
     override_action {
       dynamic "none" {
         for_each = var.passive ? [] : [true]
-        content { }
+        content {}
       }
 
       dynamic "count" {
         for_each = var.passive ? [true] : []
-        content { }
+        content {}
       }
     }
 
@@ -194,12 +210,12 @@ resource "aws_wafv2_web_acl" "waf" {
     override_action {
       dynamic "none" {
         for_each = var.passive ? [] : [true]
-        content { }
+        content {}
       }
 
       dynamic "count" {
         for_each = var.passive ? [true] : []
-        content { }
+        content {}
       }
     }
 
@@ -224,12 +240,12 @@ resource "aws_wafv2_web_acl" "waf" {
     override_action {
       dynamic "none" {
         for_each = var.passive ? [] : [true]
-        content { }
+        content {}
       }
 
       dynamic "count" {
         for_each = var.passive ? [true] : []
-        content { }
+        content {}
       }
     }
 
@@ -254,12 +270,12 @@ resource "aws_wafv2_web_acl" "waf" {
     override_action {
       dynamic "none" {
         for_each = var.passive ? [] : [true]
-        content { }
+        content {}
       }
 
       dynamic "count" {
         for_each = var.passive ? [true] : []
-        content { }
+        content {}
       }
     }
 

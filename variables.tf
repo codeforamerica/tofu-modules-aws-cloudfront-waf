@@ -43,13 +43,25 @@ variable "ip_set_rules" {
     priority = optional(number, null)
     arn      = string
   }))
-  description = "Custom WAF rules to apply to the CloudFront distribution."
+  description = "Custom IP Set rules for the WAF."
+  default     = {}
+}
+
+variable "rate_limit_rules" {
+  type = map(object({
+    name     = optional(string, "")
+    action   = optional(string, "block")
+    limit    = optional(number, 10)
+    window   = optional(number, 60)
+    priority = optional(number, null)
+  }))
+  description = "Rate limiting configuration for the WAF."
   default     = {}
 }
 
 variable "subdomain" {
   type        = string
-  description = "Subdomain used for this deployment. Defaults to the environment."
+  description = "Subdomain for the distribution. Defaults to the environment."
   default     = ""
 }
 

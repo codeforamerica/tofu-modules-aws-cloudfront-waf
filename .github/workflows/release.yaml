@@ -16,7 +16,7 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v4
         with:
-          fetch-tags: true
+          fetch-depth: 0
       - name: Bump version and create changelog
         id: bump
         uses: commitizen-tools/commitizen-action@master
