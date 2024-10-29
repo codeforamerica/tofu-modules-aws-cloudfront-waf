@@ -49,8 +49,6 @@ these rules are spaced out to allow for custom rules to be inserted between.
 
 ## Inputs
 
-> [!WARNING]
-> **This is an early release, and the API is subject to change until `v1.0.0`.**
 
 | Name               | Description                                                                                         | Type          | Default | Required |
 |--------------------|-----------------------------------------------------------------------------------------------------|---------------|---------|----------|
@@ -119,8 +117,9 @@ To rate limit traffic based on IP address, you can specify a map of rate limit
 rules to create. The rate limit rules are applied in the order they are defined,
 or though the `priority` field.
 
-> _Note: Rate limit rules are added after all IP set rules by default. Use
-> `priority` to order your rules if you need more control._
+> [!NOTE]
+> Rate limit rules are added after all IP set rules by default. Use `priority`
+> to order your rules if you need more control.
 
 For example, to rate limit requests to 300 over a 5-minute period:
 
