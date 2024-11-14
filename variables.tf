@@ -3,6 +3,12 @@ variable "domain" {
   description = "Domain used for this deployment."
 }
 
+variable "custom_headers" {
+  type        = map(string)
+  description = "Custom headers to send to the origin."
+  default     = {}
+}
+
 variable "environment" {
   type        = string
   description = "Environment for the deployment."

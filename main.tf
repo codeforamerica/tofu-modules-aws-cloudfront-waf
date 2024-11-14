@@ -38,6 +38,15 @@ resource "aws_cloudfront_distribution" "waf" {
     connection_attempts = 3
     connection_timeout  = 10
 
+    dynamic "custom_header" {
+      for_each = var.custom_headers
+
+      content {
+        name  = each.key
+        value = each.value
+      }
+    }
+
     custom_origin_config {
       http_port                = 80
       https_port               = 443
