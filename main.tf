@@ -42,8 +42,8 @@ resource "aws_cloudfront_distribution" "waf" {
       for_each = var.custom_headers
 
       content {
-        name  = each.key
-        value = each.value
+        name  = custom_header.key
+        value = custom_header.value
       }
     }
 
