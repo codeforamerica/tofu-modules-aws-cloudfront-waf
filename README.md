@@ -1,6 +1,6 @@
 # CloudFront WAF Module
 
-[![Main Checks](https://github.com/codeforamerica/tofu-modules-aws-cloudfront-waf/actions/workflows/main.yaml/badge.svg)](https://github.com/codeforamerica/tofu-modules-aws-cloudfront-waf/actions/workflows/main.yaml) ![GitHub Release](https://img.shields.io/github/v/release/codeforamerica/tofu-modules-aws-cloudfront-waf?logo=github&label=Latest%20Release)
+[![Main Checks][badge-checks]][code-checks] [![GitHub Release][badge-release]][latest-release]
 
 This module creates a CloudFront [distribution] that passes traffic through a
 Web Application Firewall (WAF) _without_ caching.
@@ -13,7 +13,7 @@ to match your desired configuration. For example, to create a new distribution
 
 ```hcl
 module "cloudfront_waf" {
-  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf"
+  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.3.0"
 
   project     = "my-project"
   environment = "dev"
@@ -56,6 +56,7 @@ these rules are spaced out to allow for custom rules to be inserted between.
 | log_bucket         | Domain name of the S3 bucket to send logs to.                                                       | `string`      | n/a     | yes      |
 | log_group          | CloudWatch log group to send WAF logs to.                                                           | `string`      | n/a     | yes      |
 | project            | Project that these resources are supporting.                                                        | `string`      | n/a     | yes      |
+| [custom_headers]   | Custom headers to send to the origin.                                                               | `map(string)` | `{}`    | no       |
 | environment        | The environment for the deployment.                                                                 | `string`      | `"dev"` | no       |
 | [ip_set_rules]     | Custom IP Set rules for the WAF                                                                     | `map(object)` | `{}`    | no       |
 | [rate_limit_rules] | Rate limiting configuration for the WAF.                                                            | `map(object)` | `{}`    | no       |
@@ -63,6 +64,33 @@ these rules are spaced out to allow for custom rules to be inserted between.
 | passive            | Enable passive mode for the WAF, counting all requests rather than blocking.                        | `bool`        | `false` | no       |
 | subdomain          | Subdomain for the distribution. Defaults to the environment.                                        | `string`      | n/a     | no       |
 | tags               | Optional tags to be applied to all resources.                                                       | `map(string)` | `{}`    | no       |
+
+### custom_headers
+
+> [!NOTE]
+> Some headers can not be added to the request. These mostly represent common
+> headers and those reserved for specific use cases, such as `Content-Length`
+> and `X-Amz-*`. The full list of restricted headers can be found in the
+> [CloudFront documentation][cloudfront-headers].
+
+You can add custom headers to the request before passing it on to the origin.
+Simply specify the headers you want to add in a map. For example:
+
+```hcl
+module "cloudfront_waf" {
+  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.3.0"
+
+  project     = "my-project"
+  environment = "dev"
+  domain      = "my-project.org"
+  log_bucket  = module.logging.bucket
+
+  custom_headers = {
+    x-custom-header = "my-custom-value"
+    x-origin-token  = "my-origin-token"
+  }
+}
+```
 
 ### ip_set_rules
 
@@ -86,7 +114,7 @@ resource "aws_wafv2_ip_set" "security_scanners" {
 }
 
 module "cloudfront_waf" {
-  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.1.0"
+  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.3.0"
 
   project     = "my-project"
   environment = "staging"
@@ -95,10 +123,10 @@ module "cloudfront_waf" {
 
   ip_set_rules = {
     scanners = {
-      name = "my-project-staging-security-scanners"
+      name     = "my-project-staging-security-scanners"
       priority = 0
-      action = "allow"
-      arn = aws_wafv2_ip_set.security_scanners.arn
+      action   = "allow"
+      arn      = aws_wafv2_ip_set.security_scanners.arn
     }
   }
 }
@@ -125,7 +153,7 @@ For example, to rate limit requests to 300 over a 5-minute period:
 
 ```hcl
 module "cloudfront_waf" {
-  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.1.0"
+  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.3.0"
 
   project     = "my-project"
   environment = "staging"
@@ -134,9 +162,9 @@ module "cloudfront_waf" {
 
   rate_limit_rules = {
     limit = {
-      name = "my-project-staging-rate-limit"
+      name   = "my-project-staging-rate-limit"
       action = "block"
-      limit = 500
+      limit  = 500
       window = 500
     }
   }
@@ -151,9 +179,15 @@ module "cloudfront_waf" {
 | priority | Rule priority. Defaults to the rule's position in the map + the number of IP set rules. | `number` | `nil`     | no       |
 | window   | Number of seconds to limit requests in. Options are: 60, 120, 300, 600                  | `number` | `60`      | no       |
 
+[badge-checks]: https://github.com/codeforamerica/tofu-modules-aws-cloudfront-waf/actions/workflows/main.yaml/badge.svg
+[badge-release]: https://img.shields.io/github/v/release/codeforamerica/tofu-modules-aws-cloudfront-waf?logo=github&label=Latest%20Release
+[cloudfront-headers]: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/add-origin-custom-headers.html#add-origin-custom-headers-denylist
+[code-checks]: https://github.com/codeforamerica/tofu-modules-aws-cloudfront-waf/actions/workflows/main.yaml
+[custom_headers]: #custom_headers
 [distribution]: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/distribution-working-with.html
 [ip-rules]: https://docs.aws.amazon.com/waf/latest/developerguide/waf-rule-statement-type-ipset-match.html
 [ip_set_rules]: #ip_set_rules
+[latest-release]: https://github.com/codeforamerica/tofu-modules-aws-cloudfront-waf/releases/latest
 [rate_limit_rules]: #rate_limit_rules
 [rules-common]: https://docs.aws.amazon.com/waf/latest/developerguide/aws-managed-rule-groups-baseline.html#aws-managed-rule-groups-baseline-crs
 [rules-inputs]: https://docs.aws.amazon.com/waf/latest/developerguide/aws-managed-rule-groups-baseline.html#aws-managed-rule-groups-baseline-known-bad-inputs
