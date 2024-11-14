@@ -13,7 +13,7 @@ to match your desired configuration. For example, to create a new distribution
 
 ```hcl
 module "cloudfront_waf" {
-  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf"
+  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.3.0"
 
   project     = "my-project"
   environment = "dev"
@@ -78,7 +78,7 @@ Simply specify the headers you want to add in a map. For example:
 
 ```hcl
 module "cloudfront_waf" {
-  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf"
+  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.3.0"
 
   project     = "my-project"
   environment = "dev"
@@ -114,7 +114,7 @@ resource "aws_wafv2_ip_set" "security_scanners" {
 }
 
 module "cloudfront_waf" {
-  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.1.0"
+  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.3.0"
 
   project     = "my-project"
   environment = "staging"
@@ -123,10 +123,10 @@ module "cloudfront_waf" {
 
   ip_set_rules = {
     scanners = {
-      name = "my-project-staging-security-scanners"
+      name     = "my-project-staging-security-scanners"
       priority = 0
-      action = "allow"
-      arn = aws_wafv2_ip_set.security_scanners.arn
+      action   = "allow"
+      arn      = aws_wafv2_ip_set.security_scanners.arn
     }
   }
 }
@@ -153,7 +153,7 @@ For example, to rate limit requests to 300 over a 5-minute period:
 
 ```hcl
 module "cloudfront_waf" {
-  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.1.0"
+  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.3.0"
 
   project     = "my-project"
   environment = "staging"
@@ -162,9 +162,9 @@ module "cloudfront_waf" {
 
   rate_limit_rules = {
     limit = {
-      name = "my-project-staging-rate-limit"
+      name   = "my-project-staging-rate-limit"
       action = "block"
-      limit = 500
+      limit  = 500
       window = 500
     }
   }
