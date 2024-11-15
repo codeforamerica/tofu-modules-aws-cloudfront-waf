@@ -76,3 +76,12 @@ variable "tags" {
   description = "Tags to apply to all resources."
   default     = {}
 }
+
+variable "upload_paths" {
+  type = list(object({
+    constraint = optional(string, "EXACTLY")
+    path       = string
+  }))
+  description = "Paths to allow uploads to."
+  default     = []
+}
