@@ -50,20 +50,21 @@ these rules are spaced out to allow for custom rules to be inserted between.
 ## Inputs
 
 
-| Name               | Description                                                                                         | Type          | Default | Required |
-|--------------------|-----------------------------------------------------------------------------------------------------|---------------|---------|----------|
-| domain             | Primary domain for the distribution. The hosted zone for this domain should be in the same account. | `string`      | n/a     | yes      |
-| log_bucket         | Domain name of the S3 bucket to send logs to.                                                       | `string`      | n/a     | yes      |
-| log_group          | CloudWatch log group to send WAF logs to.                                                           | `string`      | n/a     | yes      |
-| project            | Project that these resources are supporting.                                                        | `string`      | n/a     | yes      |
-| [custom_headers]   | Custom headers to send to the origin.                                                               | `map(string)` | `{}`    | no       |
-| environment        | The environment for the deployment.                                                                 | `string`      | `"dev"` | no       |
-| [ip_set_rules]     | Custom IP Set rules for the WAF                                                                     | `map(object)` | `{}`    | no       |
-| [rate_limit_rules] | Rate limiting configuration for the WAF.                                                            | `map(object)` | `{}`    | no       |
-| origin_domain      | Fully qualified domain name for the origin. Defaults to `origin.${subdomain}.${domain}`.            | `string`      | n/a     | no       |
-| passive            | Enable passive mode for the WAF, counting all requests rather than blocking.                        | `bool`        | `false` | no       |
-| subdomain          | Subdomain for the distribution. Defaults to the environment.                                        | `string`      | n/a     | no       |
-| tags               | Optional tags to be applied to all resources.                                                       | `map(string)` | `{}`    | no       |
+| Name               | Description                                                                                         | Type           | Default | Required |
+|--------------------|-----------------------------------------------------------------------------------------------------|----------------|---------|----------|
+| domain             | Primary domain for the distribution. The hosted zone for this domain should be in the same account. | `string`       | n/a     | yes      |
+| log_bucket         | Domain name of the S3 bucket to send logs to.                                                       | `string`       | n/a     | yes      |
+| log_group          | CloudWatch log group to send WAF logs to.                                                           | `string`       | n/a     | yes      |
+| project            | Project that these resources are supporting.                                                        | `string`       | n/a     | yes      |
+| [custom_headers]   | Custom headers to send to the origin.                                                               | `map(string)`  | `{}`    | no       |
+| environment        | The environment for the deployment.                                                                 | `string`       | `"dev"` | no       |
+| [ip_set_rules]     | Custom IP Set rules for the WAF                                                                     | `map(object)`  | `{}`    | no       |
+| [rate_limit_rules] | Rate limiting configuration for the WAF.                                                            | `map(object)`  | `{}`    | no       |
+| origin_domain      | Fully qualified domain name for the origin. Defaults to `origin.${subdomain}.${domain}`.            | `string`       | n/a     | no       |
+| passive            | Enable passive mode for the WAF, counting all requests rather than blocking.                        | `bool`         | `false` | no       |
+| subdomain          | Subdomain for the distribution. Defaults to the environment.                                        | `string`       | n/a     | no       |
+| tags               | Optional tags to be applied to all resources.                                                       | `map(string)`  | `{}`    | no       |
+| [upload_paths]     | Optional paths to allow uploads to.                                                                 | `list(object)` | `[]`    | no       |
 
 ### custom_headers
 
@@ -179,10 +180,51 @@ module "cloudfront_waf" {
 | priority | Rule priority. Defaults to the rule's position in the map + the number of IP set rules. | `number` | `nil`     | no       |
 | window   | Number of seconds to limit requests in. Options are: 60, 120, 300, 600                  | `number` | `60`      | no       |
 
+### upload_paths
+
+The [AWSManagedRulesCommonRuleSet][rules-common] rule group, by default, will
+block requests over 8KB in size, via the `SizeRestrictions_BODY` rule. We can
+override this to exclude certain paths that are used for file uploads.
+
+> [!NOTE]
+> The `constraint` field defines how the path is matched. Valid values are:
+> `EXACTLY`, `STARTS_WITH`, `ENDS_WITH`, `CONTAINS`, `CONTAINS_WORD`.
+>
+> For more information on how these are applied, see the [AWS
+> documentation][constraints].
+
+```hcl
+module "cloudfront_waf" {
+  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.3.0"
+
+  project     = "my-project"
+  environment = "staging"
+  domain      = "my-project.org"
+  log_bucket  = module.logging.bucket
+
+  upload_paths = [
+    {
+      constraint = "ENDS_WITH"
+      path       = "/documents"
+    },
+    {
+      constraint = "EXACTLY"
+      path       = "/upload"
+    }
+  ]
+}
+```
+
+| Name       | Description                                           | Type     | Default   | Required |
+|------------|-------------------------------------------------------|----------|-----------|----------|
+| path       | The path to exempt from the rule.                     | `string` | n/a       | yes      |
+| constraint | Constraint to apply when testing for the path | `string` | `"EXACTLY"` | no       |
+
 [badge-checks]: https://github.com/codeforamerica/tofu-modules-aws-cloudfront-waf/actions/workflows/main.yaml/badge.svg
 [badge-release]: https://img.shields.io/github/v/release/codeforamerica/tofu-modules-aws-cloudfront-waf?logo=github&label=Latest%20Release
 [cloudfront-headers]: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/add-origin-custom-headers.html#add-origin-custom-headers-denylist
 [code-checks]: https://github.com/codeforamerica/tofu-modules-aws-cloudfront-waf/actions/workflows/main.yaml
+[constraints]: https://docs.aws.amazon.com/waf/latest/APIReference/API_ByteMatchStatement.html
 [custom_headers]: #custom_headers
 [distribution]: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/distribution-working-with.html
 [ip-rules]: https://docs.aws.amazon.com/waf/latest/developerguide/waf-rule-statement-type-ipset-match.html
@@ -193,4 +235,5 @@ module "cloudfront_waf" {
 [rules-inputs]: https://docs.aws.amazon.com/waf/latest/developerguide/aws-managed-rule-groups-baseline.html#aws-managed-rule-groups-baseline-known-bad-inputs
 [rules-ip-rep]: https://docs.aws.amazon.com/waf/latest/developerguide/aws-managed-rule-groups-ip-rep.html#aws-managed-rule-groups-ip-rep-amazon
 [rules-sqli]: https://docs.aws.amazon.com/waf/latest/developerguide/aws-managed-rule-groups-use-case.html#aws-managed-rule-groups-use-case-sql-db
+[upload_paths]: #upload_paths
 [wafv2_ip_set]: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/wafv2_ip_set

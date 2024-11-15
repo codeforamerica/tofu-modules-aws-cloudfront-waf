@@ -78,8 +78,6 @@ variable "tags" {
 }
 
 variable "upload_paths" {
-  # Valid values: EXACTLY, STARTS_WITH, ENDS_WITH, CONTAINS, CONTAINS_WORD
-  # See: https://docs.aws.amazon.com/waf/latest/APIReference/API_ByteMatchStatement.html
   type = list(object({
     constraint = optional(string, "EXACTLY")
     path       = string
