@@ -186,6 +186,9 @@ The [AWSManagedRulesCommonRuleSet][rules-common] rule group, by default, will
 block requests over 8KB in size, via the `SizeRestrictions_BODY` rule. We can
 override this to exclude certain paths that are used for file uploads.
 
+The new rule created by this override will be given the priority of `301`, to
+ensure it comes directly after the common rule set.
+
 > [!NOTE]
 > The `constraint` field defines how the path is matched. Valid values are:
 > `EXACTLY`, `STARTS_WITH`, `ENDS_WITH`, `CONTAINS`, `CONTAINS_WORD`.
