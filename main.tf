@@ -233,12 +233,80 @@ resource "aws_wafv2_web_acl" "waf" {
         name        = "AWSManagedRulesCommonRuleSet"
         vendor_name = "AWS"
       }
+
+      # If a set of upload paths have been provided, override the action for the
+      # SizeRestrictions_BODY rule. We'll create a custom rule that will exempt
+      # the provided paths.
+      dynamic "rule_action_override" {
+        for_each = length(var.upload_paths) > 0 ? [true] : []
+
+        content {
+          name = "SizeRestrictions_BODY"
+
+          action_to_use {
+            count {}
+          }
+        }
+      }
     }
 
     visibility_config {
       cloudwatch_metrics_enabled = true
       metric_name                = "${local.prefix}-waf-common-rules"
       sampled_requests_enabled   = true
+    }
+  }
+
+  dynamic "rule" {
+    for_each = var.upload_paths
+
+    content {
+      # name = "gyr-demo-waf-request-body-size-${rule.key}"
+      name = "gyr-demo-waf-request-body-size"
+      # priority = 301
+      priority = 400
+
+      action {
+        block {}
+      }
+
+      statement {
+        and_statement {
+          statement {
+            label_match_statement {
+              key   = "awswaf:managed:aws:core-rule-set:SizeRestrictions_Body"
+              scope = "LABEL"
+            }
+          }
+
+          statement {
+            not_statement {
+              statement {
+                byte_match_statement {
+                  positional_constraint = rule.constraint
+                  search_string         = rule.path
+
+                  field_to_match {
+                    uri_path {}
+                  }
+
+                  text_transformation {
+                    priority = 0
+                    type     = "NONE"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
+      visibility_config {
+        cloudwatch_metrics_enabled = true
+        # metric_name                = "gyr-demo-waf-request-body-size-${rule.key}"
+        metric_name              = "gyr-demo-waf-request-body-size"
+        sampled_requests_enabled = true
+      }
     }
   }
 
