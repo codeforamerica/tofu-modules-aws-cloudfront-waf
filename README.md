@@ -13,7 +13,7 @@ to match your desired configuration. For example, to create a new distribution
 
 ```hcl
 module "cloudfront_waf" {
-  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.3.0"
+  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.4.0"
 
   project     = "my-project"
   environment = "dev"
@@ -79,7 +79,7 @@ Simply specify the headers you want to add in a map. For example:
 
 ```hcl
 module "cloudfront_waf" {
-  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.3.0"
+  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.4.0"
 
   project     = "my-project"
   environment = "dev"
@@ -115,7 +115,7 @@ resource "aws_wafv2_ip_set" "security_scanners" {
 }
 
 module "cloudfront_waf" {
-  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.3.0"
+  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.4.0"
 
   project     = "my-project"
   environment = "staging"
@@ -154,7 +154,7 @@ For example, to rate limit requests to 300 over a 5-minute period:
 
 ```hcl
 module "cloudfront_waf" {
-  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.3.0"
+  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.4.0"
 
   project     = "my-project"
   environment = "staging"
@@ -195,7 +195,7 @@ override this to exclude certain paths that are used for file uploads.
 
 ```hcl
 module "cloudfront_waf" {
-  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.3.0"
+  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.4.0"
 
   project     = "my-project"
   environment = "staging"
