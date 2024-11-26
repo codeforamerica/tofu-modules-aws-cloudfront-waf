@@ -327,7 +327,7 @@ resource "aws_wafv2_web_acl" "waf" {
           for_each = length(var.upload_paths) > 0 ? [true] : []
 
           content {
-            name = "SQLi_Body"
+            name = "SQLi_BODY"
 
             action_to_use {
               count {}
