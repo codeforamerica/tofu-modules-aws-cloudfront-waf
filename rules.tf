@@ -114,14 +114,6 @@ resource "aws_wafv2_rule_group" "uploads" {
           }
         }
 
-        # We want to make sure there was also a file upload.
-        statement {
-          label_match_statement {
-            key   = "awswaf:managed:aws:core-rule-set:SizeRestrictions_Body"
-            scope = "LABEL"
-          }
-        }
-
         statement {
           # If we have more than one upload path, we need to create an OR
           # statement to match on any of the paths.
@@ -204,14 +196,6 @@ resource "aws_wafv2_rule_group" "uploads" {
         statement {
           label_match_statement {
             key   = "awswaf:managed:aws:core-rule-set:CrossSiteScripting_Body"
-            scope = "LABEL"
-          }
-        }
-
-        # We want to make sure there was also a file upload.
-        statement {
-          label_match_statement {
-            key   = "awswaf:managed:aws:core-rule-set:SizeRestrictions_Body"
             scope = "LABEL"
           }
         }
