@@ -252,7 +252,7 @@ resource "aws_wafv2_web_acl" "waf" {
           for_each = length(var.upload_paths) > 0 ? [true] : []
 
           content {
-            name = "CrossSiteScripting_Body"
+            name = "CrossSiteScripting_BODY"
 
             action_to_use {
               count {}
