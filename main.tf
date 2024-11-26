@@ -233,14 +233,26 @@ resource "aws_wafv2_web_acl" "waf" {
         name        = "AWSManagedRulesCommonRuleSet"
         vendor_name = "AWS"
 
-        # If a set of upload paths have been provided, override the action for the
-        # SizeRestrictions_BODY rule. We'll create a custom rule that will exempt
-        # the provided paths.
+        # If a set of upload paths have been provided, override the action for
+        # the body size and cross-site scripting (XSS) rules. We'll create a
+        # custom rule that will exempt the provided paths.
         dynamic "rule_action_override" {
           for_each = length(var.upload_paths) > 0 ? [true] : []
 
           content {
             name = "SizeRestrictions_BODY"
+
+            action_to_use {
+              count {}
+            }
+          }
+        }
+
+        dynamic "rule_action_override" {
+          for_each = length(var.upload_paths) > 0 ? [true] : []
+
+          content {
+            name = "CrossSiteScripting_Body"
 
             action_to_use {
               count {}
@@ -254,27 +266,6 @@ resource "aws_wafv2_web_acl" "waf" {
       cloudwatch_metrics_enabled = true
       metric_name                = "${local.prefix}-waf-common-rules"
       sampled_requests_enabled   = true
-    }
-  }
-
-  dynamic "rule" {
-    for_each = length(var.upload_paths) > 0 ? [true] : []
-
-    content {
-      name = "${local.prefix}-waf-upload-paths"
-      priority = 301
-
-      dynamic "override_action" {
-        for_each = var.passive ? [true] : []
-
-        content {
-          count {}
-        }
-      }
-
-      rule_group_reference_statement {
-        arn = aws_wafv2_rule_group.uploads.arn
-      }
     }
   }
 
@@ -418,6 +409,21 @@ resource "aws_wafv2_web_acl" "waf" {
       managed_rule_group_statement {
         name        = "AWSManagedRulesSQLiRuleSet"
         vendor_name = "AWS"
+
+        # If a set of upload paths have been provided, override the action for
+        # the SQL injection rule. We'll create a custom rule that will exempt
+        # the provided paths.
+        dynamic "rule_action_override" {
+          for_each = length(var.upload_paths) > 0 ? [true] : []
+
+          content {
+            name = "SQLi_Body"
+
+            action_to_use {
+              count {}
+            }
+          }
+        }
       }
     }
 
@@ -425,6 +431,39 @@ resource "aws_wafv2_web_acl" "waf" {
       cloudwatch_metrics_enabled = true
       metric_name                = "${local.prefix}-waf-sqli"
       sampled_requests_enabled   = true
+    }
+  }
+
+  dynamic "rule" {
+    for_each = length(var.upload_paths) > 0 ? [true] : []
+
+    content {
+      name = "${local.prefix}-waf-upload-paths"
+      priority = 550
+
+      override_action {
+        dynamic "none" {
+          for_each = var.passive ? [] : [true]
+          content {}
+        }
+
+        dynamic "count" {
+          for_each = var.passive ? [true] : []
+          content {}
+        }
+      }
+
+      statement {
+        rule_group_reference_statement {
+          arn = aws_wafv2_rule_group.uploads["this"].arn
+        }
+      }
+
+      visibility_config {
+        cloudwatch_metrics_enabled = true
+        metric_name                = "${local.prefix}-waf-upload-rules"
+        sampled_requests_enabled   = true
+      }
     }
   }
 
