@@ -348,7 +348,7 @@ resource "aws_wafv2_web_acl" "waf" {
     for_each = length(var.upload_paths) > 0 ? [true] : []
 
     content {
-      name = "${local.prefix}-waf-upload-paths"
+      name     = "${local.prefix}-waf-upload-paths"
       priority = 550
 
       override_action {

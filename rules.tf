@@ -1,8 +1,8 @@
 resource "aws_wafv2_rule_group" "uploads" {
   for_each = length(var.upload_paths) > 0 ? toset(["this"]) : toset([])
 
-  name = "${local.prefix}-waf-allow-uploads"
-  scope = "CLOUDFRONT"
+  name     = "${local.prefix}-waf-allow-uploads"
+  scope    = "CLOUDFRONT"
   capacity = 11
 
   visibility_config {
