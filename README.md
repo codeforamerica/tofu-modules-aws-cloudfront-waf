@@ -183,11 +183,13 @@ module "cloudfront_waf" {
 ### upload_paths
 
 The [AWSManagedRulesCommonRuleSet][rules-common] rule group, by default, will
-block requests over 8KB in size, via the `SizeRestrictions_BODY` rule. We can
-override this to exclude certain paths that are used for file uploads.
+block requests over 8KB in size, via the `SizeRestrictions_BODY` rule.
+Additionally, random characters in the file metadata can trigger the
+`CrossSiteScripting_BODY` and `SQLi_BODY` rules. We can override this to exclude
+certain paths that are used for file uploads.
 
-The new rule created by this override will be given the priority of `301`, to
-ensure it comes directly after the common rule set.
+The new rule created by this override will be given the priority of `550`, to
+ensure it comes after the common and SQLi rule sets.
 
 > [!NOTE]
 > The `constraint` field defines how the path is matched. Valid values are:
