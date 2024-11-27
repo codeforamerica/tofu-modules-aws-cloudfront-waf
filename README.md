@@ -183,11 +183,13 @@ module "cloudfront_waf" {
 ### upload_paths
 
 The [AWSManagedRulesCommonRuleSet][rules-common] rule group, by default, will
-block requests over 8KB in size, via the `SizeRestrictions_BODY` rule. We can
-override this to exclude certain paths that are used for file uploads.
+block requests over 8KB in size, via the `SizeRestrictions_BODY` rule.
+Additionally, [random characters in the file metadata][file-false-positives] can
+trigger the `CrossSiteScripting_BODY` and `SQLi_BODY` rules. We can override
+this to exclude certain paths that are used for file uploads.
 
-The new rule created by this override will be given the priority of `301`, to
-ensure it comes directly after the common rule set.
+The new rule created by this override will be given the priority of `550`, to
+ensure it comes after the common and SQLi rule sets.
 
 > [!NOTE]
 > The `constraint` field defines how the path is matched. Valid values are:
@@ -230,6 +232,7 @@ module "cloudfront_waf" {
 [constraints]: https://docs.aws.amazon.com/waf/latest/APIReference/API_ByteMatchStatement.html
 [custom_headers]: #custom_headers
 [distribution]: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/distribution-working-with.html
+[file-false-positives]: https://repost.aws/knowledge-center/waf-upload-blocked-files
 [ip-rules]: https://docs.aws.amazon.com/waf/latest/developerguide/waf-rule-statement-type-ipset-match.html
 [ip_set_rules]: #ip_set_rules
 [latest-release]: https://github.com/codeforamerica/tofu-modules-aws-cloudfront-waf/releases/latest
