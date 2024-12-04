@@ -10,7 +10,11 @@ and this project adheres to
 
 ### Feat
 
-- Allow the managed request policy to be specified. (GYR1-621) (#16)
+- Allow the managed request policy to be specified. (#16)
+
+### Fix
+
+- fix: Updated the default request policy to "AllViewer", as recommended for custom origins. (GYR1-621)
 
 ## 1.4.1 (2024-11-27)
 
