@@ -1,5 +1,5 @@
 data "aws_cloudfront_origin_request_policy" "managed_cors" {
-  name = "Managed-CORS-CustomOrigin"
+  name = "Managed-${var.request_policy}"
 }
 
 data "aws_cloudfront_response_headers_policy" "managed_cors" {

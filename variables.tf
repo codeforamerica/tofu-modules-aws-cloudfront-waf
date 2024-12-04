@@ -15,6 +15,17 @@ variable "environment" {
   default     = "dev"
 }
 
+variable "ip_set_rules" {
+  type = map(object({
+    name     = optional(string, "")
+    action   = optional(string, "allow")
+    priority = optional(number, null)
+    arn      = string
+  }))
+  description = "Custom IP Set rules for the WAF."
+  default     = {}
+}
+
 variable "log_bucket" {
   type        = string
   description = "S3 Bucket to send logs to."
@@ -42,17 +53,6 @@ variable "project" {
   description = "Project that these resources are supporting."
 }
 
-variable "ip_set_rules" {
-  type = map(object({
-    name     = optional(string, "")
-    action   = optional(string, "allow")
-    priority = optional(number, null)
-    arn      = string
-  }))
-  description = "Custom IP Set rules for the WAF."
-  default     = {}
-}
-
 variable "rate_limit_rules" {
   type = map(object({
     name     = optional(string, "")
@@ -63,6 +63,25 @@ variable "rate_limit_rules" {
   }))
   description = "Rate limiting configuration for the WAF."
   default     = {}
+}
+
+variable "request_policy" {
+  type        = string
+  description = "Managed request policy to associate with the distribution."
+  default     = "AllViewer"
+
+  validation {
+    condition = contains([
+      "AllViewer",
+      "AllViewerAndCloudFrontHeaders-2022-06",
+      "AllViewerExceptHostHeader",
+      "CORS-CustomOrigin",
+      "CORS-S3Origin",
+      "Elemental-MediaTailor-PersonalizedManifests",
+      "UserAgentRefererHeaders"
+    ], var.request_policy)
+    error_message = "Invalid request policy. See https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-managed-origin-request-policies.html"
+  }
 }
 
 variable "subdomain" {
