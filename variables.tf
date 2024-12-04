@@ -71,15 +71,15 @@ variable "request_policy" {
   default     = "AllViewer"
 
   validation {
-    condition     = contains([
-        "AllViewer",
-        "AllViewerAndCloudFrontHeaders-2022-06",
-        "AllViewerExceptHostHeader",
-        "CORS-CustomOrigin",
-        "CORS-S3Origin",
-        "Elemental-MediaTailor-PersonalizedManifests",
-        "UserAgentRefererHeaders"
-      ], var.request_policy)
+    condition = contains([
+      "AllViewer",
+      "AllViewerAndCloudFrontHeaders-2022-06",
+      "AllViewerExceptHostHeader",
+      "CORS-CustomOrigin",
+      "CORS-S3Origin",
+      "Elemental-MediaTailor-PersonalizedManifests",
+      "UserAgentRefererHeaders"
+    ], var.request_policy)
     error_message = "Invalid request policy. See https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-managed-origin-request-policies.html"
   }
 }
