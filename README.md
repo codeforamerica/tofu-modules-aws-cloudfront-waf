@@ -13,7 +13,7 @@ to match your desired configuration. For example, to create a new distribution
 
 ```hcl
 module "cloudfront_waf" {
-  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.4.0"
+  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.6.0"
 
   project     = "my-project"
   environment = "dev"
