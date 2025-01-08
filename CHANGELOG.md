@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 1.6.0 (2025-01-08)
+
+### Feat
+
+- Replaced custom cache policy with managed policy to disable cache. (FYST-1527) (#18)
+
 ## 1.5.0 (2024-12-04)
 
 ### Feat
