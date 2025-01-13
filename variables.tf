@@ -111,11 +111,13 @@ variable "webhooks" {
       constraint = optional(string, "EXACTLY")
       path       = string
     }))
-    criteria  = list(object({
+    criteria  = optional(list(object({
       type = string
+      constraint = optional(string, "")
+      name = optional(string, "")
       field = string
       value = string
-    }))
+    })), [])
     action    = optional(string, "allow")
   }))
   description = "Webhook paths to allow."
