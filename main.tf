@@ -123,7 +123,7 @@ resource "aws_wafv2_web_acl" "waf" {
 
     content {
       name     = "${local.prefix}-waf-webhooks"
-      priority = var.webhooks_priority != null ? var.webhooks_priority : length(var.ip_set_rules) + 1
+      priority = var.webhooks_priority != null ? var.webhooks_priority : length(var.ip_set_rules)
 
       override_action {
         dynamic "none" {
