@@ -104,3 +104,28 @@ variable "upload_paths" {
   description = "Paths to allow uploads to."
   default     = []
 }
+
+variable "webhooks" {
+  type = map(object({
+    paths = list(object({
+      constraint = optional(string, "EXACTLY")
+      path       = string
+    }))
+    criteria = optional(list(object({
+      type       = string
+      constraint = optional(string, "")
+      name       = optional(string, "")
+      field      = string
+      value      = string
+    })), [])
+    action = optional(string, "allow")
+  }))
+  description = "Webhook paths to allow."
+  default     = {}
+}
+
+variable "webhooks_priority" {
+  type        = number
+  description = "Priority for the webhooks rule group. By default, an attempt is made to place it before other rules that block traffic."
+  default     = null
+}

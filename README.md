@@ -13,7 +13,7 @@ to match your desired configuration. For example, to create a new distribution
 
 ```hcl
 module "cloudfront_waf" {
-  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.6.0"
+  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.7.0"
 
   project     = "my-project"
   environment = "dev"
@@ -66,6 +66,8 @@ these rules are spaced out to allow for custom rules to be inserted between.
 | subdomain          | Subdomain for the distribution. Defaults to the environment.                                                              | `string`       | n/a           | no       |
 | tags               | Optional tags to be applied to all resources.                                                                             | `map(string)`  | `{}`          | no       |
 | [upload_paths]     | Optional paths to allow uploads to.                                                                                       | `list(object)` | `[]`          | no       |
+| [webhooks]         | Optional map of webhooks that should be allowed through the WAF.                                                          | `map(object)`  | `{}`          | no       |
+| webhooks_priority  | Priority for the webhooks rule group. By default, an attempt is made to place it before other rules that block traffic.   | `number`       | `null`        | no       |
 
 ### custom_headers
 
@@ -80,7 +82,7 @@ Simply specify the headers you want to add in a map. For example:
 
 ```hcl
 module "cloudfront_waf" {
-  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.4.0"
+  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.7.0"
 
   project     = "my-project"
   environment = "dev"
@@ -116,7 +118,7 @@ resource "aws_wafv2_ip_set" "security_scanners" {
 }
 
 module "cloudfront_waf" {
-  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.4.0"
+  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.7.0"
 
   project     = "my-project"
   environment = "staging"
@@ -155,7 +157,7 @@ For example, to rate limit requests to 300 over a 5-minute period:
 
 ```hcl
 module "cloudfront_waf" {
-  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.4.0"
+  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.7.0"
 
   project     = "my-project"
   environment = "staging"
@@ -201,7 +203,7 @@ ensure it comes after the common and SQLi rule sets.
 
 ```hcl
 module "cloudfront_waf" {
-  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.4.0"
+  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.7.0"
 
   project     = "my-project"
   environment = "staging"
@@ -221,10 +223,92 @@ module "cloudfront_waf" {
 }
 ```
 
-| Name       | Description                                           | Type     | Default   | Required |
-|------------|-------------------------------------------------------|----------|-----------|----------|
-| path       | The path to exempt from the rule.                     | `string` | n/a       | yes      |
-| constraint | Constraint to apply when testing for the path | `string` | `"EXACTLY"` | no       |
+### webhooks
+
+> [!CAUTION]
+> The WAF is only able to verify these request at a surface level. It is not
+> a replacement for proper input validation and security practices in your
+> application.
+
+If your application has webhooks, the external services that call them may be
+rate limited or otherwise blocked by the WAF. To avoid this, you can specify a
+map of webhooks that should be allowed through the WAF.
+
+For each webhook, you can specify the paths that should be exempt from the WAF.
+Rather than simply allowing all request to these paths, you can specify a set of
+conditions that must be met for the request to be allowed through.
+
+> [!NOTE]
+> Requests to webhooks paths _are not blocked_ if they fail to meet the criteria
+> for the webhook. Rather, they continue to be evaluated by the remaining rules
+> as normal.
+
+```hcl
+module "cloudfront_waf" {
+  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.7.0"
+
+  project     = "my-project"
+  environment = "staging"
+  domain      = "my-project.org"
+  log_bucket  = module.logging.bucket
+
+  webhooks = {
+    twilio = {
+      paths = [{
+          constraint = "EXACTLY"
+          path      = "/incoming_text_messages"
+        },
+        {
+          constraint = "STARTS_WITH"
+          path      = "/outgoing_text_messages/"
+      }]
+      # Make sure the `x-twilio-signature` header is present and not empty.
+      criteria = [{
+        type       = "size"
+        constraint = "GT"
+        field      = "header"
+        name       = "x-twilio-signature"
+        value      = "0"
+      }]
+      action = "allow"
+    }
+  }
+}
+```
+
+The webhooks should be keyed by the service or function that they are associated
+with. One or more `paths` are required for each webhook, and each path can
+include a different `constraint` (see [upload_paths] for more information on
+path matching).
+
+For each webhook, you can optionally specify one or more `criteria` that must be
+met for the request to be allowed. This can be used to check for specific
+headers, query parameters, or other request attributes that are expected for a
+valid request. If not criteria are specified, any requests matching the paths
+will be allowed through.
+
+| Name                          | Description                                                                                           | Type           | Default   | Required |
+|-------------------------------|-------------------------------------------------------------------------------------------------------|----------------|-----------|----------|
+| [paths][webhooks.paths]       | The webhook paths for the service or function.                                                        | `list(object)` | n/a       | yes      |
+| action                        | The action to apply to requests matching the criteria. Valid values are `allow`, `block`, and `count`. | `string`       | `"allow"` | no       |
+| [criteria][webhooks.criteria] | Constraint to apply when testing for the path                                                         | `list(object)` | `[]`      | no       |
+
+#### criteria
+
+| Name       | Description                                                                                                                                                              | Type     | Default | Required  |
+|------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------|---------|-----------|
+| field      | The field to apply the constraint to. Supported values are `header`, and `uri`.                                                                                          | `string` | n/a     | yes       |
+| type       | The type of statement for this criteria. Supported values are `byte` and `size`.                                                                                         | `string` | n/a     | yes       |
+| value      | The comparison value for the constraint.                                                                                                                                 | `string` | n/a     | yes       |
+| constraint | The constraint to apply within the rule. The actual value will be dependent on the `type`. Examples include `STARTS_WITH` for a `byte` statment or `GE` (>=) for `size`. | `string` | `""`    | no        |
+| name       | The name of the header to use when `field` is set to `header`.                                                                                                           | `string` | `""`    | dependant |
+
+#### paths
+
+| Name       | Description                                                                                                                              | Type     | Default     | Required |
+|------------|------------------------------------------------------------------------------------------------------------------------------------------|----------|-------------|----------|
+| path       | The path to match.                                                                                                                       | `string` | n/a         | yes      |
+| constraint | The constraint to apply when matching the path. Supported values are `EXACTLY`, `STARTS_WITH`, `ENDS_WITH`, `CONTAINS`, `CONTAINS_WORD`. | `string` | `"EXACTLY"` | no       |
 
 [badge-checks]: https://github.com/codeforamerica/tofu-modules-aws-cloudfront-waf/actions/workflows/main.yaml/badge.svg
 [badge-release]: https://img.shields.io/github/v/release/codeforamerica/tofu-modules-aws-cloudfront-waf?logo=github&label=Latest%20Release
@@ -245,3 +329,6 @@ module "cloudfront_waf" {
 [rules-sqli]: https://docs.aws.amazon.com/waf/latest/developerguide/aws-managed-rule-groups-use-case.html#aws-managed-rule-groups-use-case-sql-db
 [upload_paths]: #upload_paths
 [wafv2_ip_set]: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/wafv2_ip_set
+[webhooks]: #webhooks
+[webhooks.paths]: #paths
+[webhooks.criteria]: #criteria
