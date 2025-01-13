@@ -292,7 +292,7 @@ will be allowed through.
 | action                        | The action to apply to requests matching the criteria. Valid values are `allow`, `block`, and `count`. | `string`       | `"allow"` | no       |
 | [criteria][webhooks.criteria] | Constraint to apply when testing for the path                                                         | `list(object)` | `[]`      | no       |
 
-#### criteria
+#### criteria {#webhooks-criteria}
 
 | Name       | Description                                                                                                                                                              | Type     | Default | Required  |
 |------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------|---------|-----------|
@@ -302,7 +302,7 @@ will be allowed through.
 | constraint | The constraint to apply within the rule. The actual value will be dependent on the `type`. Examples include `STARTS_WITH` for a `byte` statment or `GE` (>=) for `size`. | `string` | `""`    | no        |
 | name       | The name of the header to use when `field` is set to `header`.                                                                                                           | `string` | `""`    | dependant |
 
-#### paths
+#### paths {#webhooks-paths}
 
 | Name       | Description                                                                                                                              | Type     | Default     | Required |
 |------------|------------------------------------------------------------------------------------------------------------------------------------------|----------|-------------|----------|
@@ -329,5 +329,5 @@ will be allowed through.
 [upload_paths]: #upload_paths
 [wafv2_ip_set]: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/wafv2_ip_set
 [webhooks]: #webhooks
-[webhooks.paths]: #paths
-[webhooks.criteria]: #criteria
+[webhooks.paths]: #webhooks-paths
+[webhooks.criteria]: #webhooks-criteria
