@@ -107,18 +107,18 @@ variable "upload_paths" {
 
 variable "webhooks" {
   type = map(object({
-    paths     = list(object({
+    paths = list(object({
       constraint = optional(string, "EXACTLY")
       path       = string
     }))
-    criteria  = optional(list(object({
-      type = string
+    criteria = optional(list(object({
+      type       = string
       constraint = optional(string, "")
-      name = optional(string, "")
-      field = string
-      value = string
+      name       = optional(string, "")
+      field      = string
+      value      = string
     })), [])
-    action    = optional(string, "allow")
+    action = optional(string, "allow")
   }))
   description = "Webhook paths to allow."
   default     = {}
