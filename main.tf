@@ -79,6 +79,7 @@ resource "aws_wafv2_web_acl" "waf" {
   }
 
   # For each IP set rule, create a rule with the appropriate action.
+  # TODO: Move these rules to their own group.
   dynamic "rule" {
     for_each = var.ip_set_rules
     content {
@@ -116,12 +117,47 @@ resource "aws_wafv2_web_acl" "waf" {
     }
   }
 
+  # Attach the webhooks rule group to the WAF, if one was created.
+  dynamic "rule" {
+    for_each = length(var.webhooks) > 0 ? [true] : []
+
+    content {
+      name     = "${local.prefix}-waf-webhooks"
+      priority = var.webhooks_priority != null ? var.webhooks_priority : length(var.ip_set_rules) + 1
+
+      override_action {
+        dynamic "none" {
+          for_each = var.passive ? [] : [true]
+          content {}
+        }
+
+        dynamic "count" {
+          for_each = var.passive ? [true] : []
+          content {}
+        }
+      }
+
+      statement {
+        rule_group_reference_statement {
+          arn = aws_wafv2_rule_group.webhooks["this"].arn
+        }
+      }
+
+      visibility_config {
+        cloudwatch_metrics_enabled = true
+        metric_name                = "${local.prefix}-waf-webhooks"
+        sampled_requests_enabled   = true
+      }
+    }
+  }
+
   # For each rate-limiting rule, create a rule with the appropriate action.
+  # TODO: Move these rules to their own group.
   dynamic "rule" {
     for_each = var.rate_limit_rules
     content {
       name     = rule.value.name != "" ? rule.value.name : "${local.prefix}-rate-${rule.key}"
-      priority = rule.value.priority != null ? rule.value.priority : index(var.ip_set_rules, rule.key) + length(var.ip_set_rules)
+      priority = rule.value.priority != null ? rule.value.priority : index(var.ip_set_rules, rule.key) + length(var.ip_set_rules) + 1
 
       action {
         dynamic "allow" {
