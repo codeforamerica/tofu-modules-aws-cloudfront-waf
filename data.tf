@@ -1,3 +1,17 @@
+data "aws_acm_certificate" "imported" {
+  for_each = var.certificate_imported ? toset(["this"]) : toset([])
+
+  domain      = var.certificate_domain != "" ? var.certificate_domain : local.fqdn
+  statuses    = ["ISSUED"]
+  types       = ["IMPORTED"]
+  most_recent = true
+
+  tags = {
+    project     = var.project
+    environment = var.environment
+  }
+}
+
 data "aws_cloudfront_cache_policy" "policy" {
   name = "Managed-CachingDisabled"
 }

@@ -3,6 +3,18 @@ variable "domain" {
   description = "Domain used for this deployment."
 }
 
+variable "certificate_domain" {
+  type        = string
+  description = "Domain for the imported certificate, if different from the endpoint. Used in conjunction with certificate_imported."
+  default     = ""
+}
+
+variable "certificate_imported" {
+  type        = bool
+  description = "Look up an imported certificate instead of creating a managed one."
+  default     = false
+}
+
 variable "custom_headers" {
   type        = map(string)
   description = "Custom headers to send to the origin."
