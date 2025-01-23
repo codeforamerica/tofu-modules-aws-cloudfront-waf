@@ -3,9 +3,9 @@ variable "domain" {
   description = "Domain used for this deployment."
 }
 
-variable "certificate_domain"  {
+variable "certificate_domain" {
   type        = string
-  description = "Domain for the imported certificate. Used in conjunction with certificate_imported."
+  description = "Domain for the imported certificate, if different from the endpoint. Used in conjunction with certificate_imported."
   default     = ""
 }
 

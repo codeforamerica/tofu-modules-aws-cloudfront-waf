@@ -47,27 +47,71 @@ these rules are spaced out to allow for custom rules to be inserted between.
 | [AWSManagedRulesKnownBadInputsRuleSet][rules-inputs]  | 400      | Protects against known bad inputs.                    |
 | [AWSManagedRulesSQLiRuleSet][rules-sqli]              | 500      | Protects against SQL injection attacks.               |
 
+## SSL Certificates
+
+By default, this module will use [AWS Certificate Manager][acm] (ACM) to manage
+certificates for the distribution. It uses [Route 53][route53] to validate the
+certificate.
+
+If you require an [extended validation][evssl] (EV) or other specialized
+certificate, you can [import your certificate][acm-import] into ACM the
+appropriate `project` and `environment` tags, and set the `certificate_imported`
+variable to `true`.
+
+> [!IMPORTANT]
+> If you have more than one imported certificate that matches the search
+> criteria, the most recent certificate will be used.
+
+If your imported certificate uses a different domain than your distribution
+(e.g. your certificate does not include the subdomain), you can specify the
+`certificate_domain` variable to match the certificate's domain.
+
+For example, to use an imported certificate for `my-project.org` with a
+distribution at `www.my-project.org`, you could use the following:
+
+> [!NOTE]
+> In this case, when the certificate was imported, the `project` tag would have
+> been set to `my-project` and the `environment` tag would have been set to
+> `dev`.
+
+```hcl
+module "cloudfront_waf" {
+  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.7.0"
+
+  project     = "my-project"
+  environment = "dev"
+  domain      = "my-project.org"
+  subdomain   = "www"
+  log_bucket  = module.logging.bucket
+
+  certificate_imported = true
+  certificate_domain   = "my-project.org"
+}
+```
+
 ## Inputs
 
 
-| Name               | Description                                                                                                               | Type           | Default       | Required |
-|--------------------|---------------------------------------------------------------------------------------------------------------------------|----------------|---------------|----------|
-| domain             | Primary domain for the distribution. The hosted zone for this domain should be in the same account.                       | `string`       | n/a           | yes      |
-| log_bucket         | Domain name of the S3 bucket to send logs to.                                                                             | `string`       | n/a           | yes      |
-| log_group          | CloudWatch log group to send WAF logs to.                                                                                 | `string`       | n/a           | yes      |
-| project            | Project that these resources are supporting.                                                                              | `string`       | n/a           | yes      |
-| [custom_headers]   | Custom headers to send to the origin.                                                                                     | `map(string)`  | `{}`          | no       |
-| environment        | The environment for the deployment.                                                                                       | `string`       | `"dev"`       | no       |
-| [ip_set_rules]     | Custom IP Set rules for the WAF                                                                                           | `map(object)`  | `{}`          | no       |
-| [rate_limit_rules] | Rate limiting configuration for the WAF.                                                                                  | `map(object)`  | `{}`          | no       |
-| origin_domain      | Fully qualified domain name for the origin. Defaults to `origin.${subdomain}.${domain}`.                                  | `string`       | n/a           | no       |
-| passive            | Enable passive mode for the WAF, counting all requests rather than blocking.                                              | `bool`         | `false`       | no       |
-| request_policy     | Managed request policy to associate with the distribution. See the [managed policies][managed-policies] for valid values. | `string`       | `"AllViewer"` | no       |
-| subdomain          | Subdomain for the distribution. Defaults to the environment.                                                              | `string`       | n/a           | no       |
-| tags               | Optional tags to be applied to all resources.                                                                             | `map(string)`  | `{}`          | no       |
-| [upload_paths]     | Optional paths to allow uploads to.                                                                                       | `list(object)` | `[]`          | no       |
-| [webhooks]         | Optional map of webhooks that should be allowed through the WAF.                                                          | `map(object)`  | `{}`          | no       |
-| webhooks_priority  | Priority for the webhooks rule group. By default, an attempt is made to place it before other rules that block traffic.   | `number`       | `null`        | no       |
+| Name                 | Description                                                                                                               | Type           | Default       | Required |
+|----------------------|---------------------------------------------------------------------------------------------------------------------------|----------------|---------------|----------|
+| domain               | Primary domain for the distribution. The hosted zone for this domain should be in the same account.                       | `string`       | n/a           | yes      |
+| log_bucket           | Domain name of the S3 bucket to send logs to.                                                                             | `string`       | n/a           | yes      |
+| log_group            | CloudWatch log group to send WAF logs to.                                                                                 | `string`       | n/a           | yes      |
+| project              | Project that these resources are supporting.                                                                              | `string`       | n/a           | yes      |
+| certificate_domain   | Domain for the imported certificate, if different from the endpoint. Used in conjunction with `certificate_imported`.     | `string`       | `""`          | no       |
+| certificate_imported | Whether the certificate is imported or managed by ACM.                                                                    | `bool`         | `false`       | no       |
+| [custom_headers]     | Custom headers to send to the origin.                                                                                     | `map(string)`  | `{}`          | no       |
+| environment          | The environment for the deployment.                                                                                       | `string`       | `"dev"`       | no       |
+| [ip_set_rules]       | Custom IP Set rules for the WAF                                                                                           | `map(object)`  | `{}`          | no       |
+| [rate_limit_rules]   | Rate limiting configuration for the WAF.                                                                                  | `map(object)`  | `{}`          | no       |
+| origin_domain        | Fully qualified domain name for the origin. Defaults to `origin.${subdomain}.${domain}`.                                  | `string`       | n/a           | no       |
+| passive              | Enable passive mode for the WAF, counting all requests rather than blocking.                                              | `bool`         | `false`       | no       |
+| request_policy       | Managed request policy to associate with the distribution. See the [managed policies][managed-policies] for valid values. | `string`       | `"AllViewer"` | no       |
+| subdomain            | Subdomain for the distribution. Defaults to the environment.                                                              | `string`       | n/a           | no       |
+| tags                 | Optional tags to be applied to all resources.                                                                             | `map(string)`  | `{}`          | no       |
+| [upload_paths]       | Optional paths to allow uploads to.                                                                                       | `list(object)` | `[]`          | no       |
+| [webhooks]           | Optional map of webhooks that should be allowed through the WAF.                                                          | `map(object)`  | `{}`          | no       |
+| webhooks_priority    | Priority for the webhooks rule group. By default, an attempt is made to place it before other rules that block traffic.   | `number`       | `null`        | no       |
 
 ### custom_headers
 
@@ -310,6 +354,8 @@ will be allowed through.
 | path       | The path to match.                                                                                                                       | `string` | n/a         | yes      |
 | constraint | The constraint to apply when matching the path. Supported values are `EXACTLY`, `STARTS_WITH`, `ENDS_WITH`, `CONTAINS`, `CONTAINS_WORD`. | `string` | `"EXACTLY"` | no       |
 
+[acm]: https://aws.amazon.com/certificate-manager/
+[acm-import]: https://docs.aws.amazon.com/acm/latest/userguide/import-certificate.html
 [badge-checks]: https://github.com/codeforamerica/tofu-modules-aws-cloudfront-waf/actions/workflows/main.yaml/badge.svg
 [badge-release]: https://img.shields.io/github/v/release/codeforamerica/tofu-modules-aws-cloudfront-waf?logo=github&label=Latest%20Release
 [cloudfront-headers]: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/add-origin-custom-headers.html#add-origin-custom-headers-denylist
@@ -317,12 +363,14 @@ will be allowed through.
 [constraints]: https://docs.aws.amazon.com/waf/latest/APIReference/API_ByteMatchStatement.html
 [custom_headers]: #custom_headers
 [distribution]: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/distribution-working-with.html
+[evssl]: https://cabforum.org/working-groups/server/extended-validation/about/
 [file-false-positives]: https://repost.aws/knowledge-center/waf-upload-blocked-files
 [ip-rules]: https://docs.aws.amazon.com/waf/latest/developerguide/waf-rule-statement-type-ipset-match.html
 [ip_set_rules]: #ip_set_rules
 [latest-release]: https://github.com/codeforamerica/tofu-modules-aws-cloudfront-waf/releases/latest
 [managed-policies]: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-managed-origin-request-policies.html
 [rate_limit_rules]: #rate_limit_rules
+[route53]: https://aws.amazon.com/route53/
 [rules-common]: https://docs.aws.amazon.com/waf/latest/developerguide/aws-managed-rule-groups-baseline.html#aws-managed-rule-groups-baseline-crs
 [rules-inputs]: https://docs.aws.amazon.com/waf/latest/developerguide/aws-managed-rule-groups-baseline.html#aws-managed-rule-groups-baseline-known-bad-inputs
 [rules-ip-rep]: https://docs.aws.amazon.com/waf/latest/developerguide/aws-managed-rule-groups-ip-rep.html#aws-managed-rule-groups-ip-rep-amazon

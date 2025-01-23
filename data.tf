@@ -1,14 +1,14 @@
 data "aws_acm_certificate" "imported" {
   for_each = var.certificate_imported ? toset(["this"]) : toset([])
 
-  domain   = var.certificate_domain != "" ? var.certificate_domain : local.fqdn
-  statuses = ["ISSUED"]
-  types = ["IMPORTED"]
+  domain      = var.certificate_domain != "" ? var.certificate_domain : local.fqdn
+  statuses    = ["ISSUED"]
+  types       = ["IMPORTED"]
   most_recent = true
 
   tags = {
-    project = "fyst"
-    environment = "production"
+    project     = var.project
+    environment = var.environment
   }
 }
 
