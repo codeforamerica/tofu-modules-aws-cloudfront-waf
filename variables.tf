@@ -117,6 +117,12 @@ variable "upload_paths" {
   default     = []
 }
 
+variable "upload_rules_capacity" {
+  type        = number
+  description = "Capacity for the upload rules. Attempts to determine the capacity if left empty."
+  default     = null
+}
+
 variable "webhooks" {
   type = map(object({
     paths = list(object({
