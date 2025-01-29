@@ -208,4 +208,8 @@ resource "aws_wafv2_rule_group" "webhooks" {
       }
     }
   }
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
