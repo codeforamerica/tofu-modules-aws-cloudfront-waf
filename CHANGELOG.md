@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 1.8.1 (2025-01-29)
+
+### Fix
+
+- Updated capacity of upload rule group to support more upload paths. (TBE-137) (#24)
+
 ## 1.8.0 (2025-01-23)
 
 ### Feat
