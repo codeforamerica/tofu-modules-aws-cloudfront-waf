@@ -266,4 +266,8 @@ resource "aws_wafv2_rule_group" "uploads" {
       sampled_requests_enabled   = true
     }
   }
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
