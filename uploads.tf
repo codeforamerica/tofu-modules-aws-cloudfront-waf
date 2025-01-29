@@ -1,7 +1,7 @@
 resource "aws_wafv2_rule_group" "uploads" {
   for_each = length(var.upload_paths) > 0 ? toset(["this"]) : toset([])
 
-  name     = "${local.prefix}-waf-allow-uploads-${random_string.suffix.result}"
+  name     = "${local.prefix}-waf-allow-uploads-${random_id.upload_suffix.id}"
   scope    = "CLOUDFRONT"
   capacity = 9 * length(var.upload_paths)
 
