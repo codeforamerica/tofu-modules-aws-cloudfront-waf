@@ -1,9 +1,9 @@
 resource "aws_wafv2_rule_group" "webhooks" {
   for_each = length(var.webhooks) > 0 ? toset(["this"]) : toset([])
 
-  name     = "${local.prefix}-webhooks"
-  scope    = "CLOUDFRONT"
-  capacity = 50
+  name_prefix = "${local.prefix}-webhooks"
+  scope       = "CLOUDFRONT"
+  capacity    = 50
 
   visibility_config {
     cloudwatch_metrics_enabled = true
