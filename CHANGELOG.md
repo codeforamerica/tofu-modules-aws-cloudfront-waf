@@ -11,6 +11,8 @@ and this project adheres to
 ### Fix
 
 - Updated capacity of upload rule group to support more upload paths. (TBE-137) (#24)
+- Set rule groups to create new groups before destroying. (#24)
+- Use a suffix for rule groups. (#24)
 
 ## 1.8.0 (2025-01-23)
 
