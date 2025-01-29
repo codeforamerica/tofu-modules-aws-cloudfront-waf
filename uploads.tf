@@ -3,7 +3,7 @@ resource "aws_wafv2_rule_group" "uploads" {
 
   name     = "${local.prefix}-waf-allow-uploads"
   scope    = "CLOUDFRONT"
-  capacity = 11
+  capacity = 9 * length(var.upload_paths)
 
   visibility_config {
     cloudwatch_metrics_enabled = true
