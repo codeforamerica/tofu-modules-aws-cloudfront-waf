@@ -13,7 +13,7 @@ to match your desired configuration. For example, to create a new distribution
 
 ```hcl
 module "cloudfront_waf" {
-  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.8.1"
+  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.8.2"
 
   project     = "my-project"
   environment = "dev"
@@ -76,7 +76,7 @@ distribution at `www.my-project.org`, you could use the following:
 
 ```hcl
 module "cloudfront_waf" {
-  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.8.1"
+  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.8.2"
 
   project     = "my-project"
   environment = "dev"
@@ -104,7 +104,8 @@ number is too low.
 > [!TIP]
 > If you encounter a capacity error during apply, such as the following:
 >
-> > WAFInvalidParameterException: Error reason: You exceeded the capacity limit for a rule group or web ACL.
+> > WAFInvalidParameterException: Error reason: You exceeded the capacity limit
+> > for a rule group or web ACL.
 >
 > this is a good indication that you may need to set the capacity manually.
 
@@ -154,7 +155,7 @@ Simply specify the headers you want to add in a map. For example:
 
 ```hcl
 module "cloudfront_waf" {
-  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.8.1"
+  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.8.2"
 
   project     = "my-project"
   environment = "dev"
@@ -190,7 +191,7 @@ resource "aws_wafv2_ip_set" "security_scanners" {
 }
 
 module "cloudfront_waf" {
-  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.8.1"
+  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.8.2"
 
   project     = "my-project"
   environment = "staging"
@@ -229,7 +230,7 @@ For example, to rate limit requests to 300 over a 5-minute period:
 
 ```hcl
 module "cloudfront_waf" {
-  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.8.1"
+  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.8.2"
 
   project     = "my-project"
   environment = "staging"
@@ -275,7 +276,7 @@ ensure it comes after the common and SQLi rule sets.
 
 ```hcl
 module "cloudfront_waf" {
-  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.8.1"
+  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.8.2"
 
   project     = "my-project"
   environment = "staging"
@@ -317,7 +318,7 @@ conditions that must be met for the request to be allowed through.
 
 ```hcl
 module "cloudfront_waf" {
-  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.8.1"
+  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.8.2"
 
   project     = "my-project"
   environment = "staging"
