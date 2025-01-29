@@ -1,13 +1,13 @@
 resource "aws_wafv2_rule_group" "uploads" {
   for_each = length(var.upload_paths) > 0 ? toset(["this"]) : toset([])
 
-  name     = "${local.prefix}-waf-allow-uploads"
-  scope    = "CLOUDFRONT"
-  capacity = 11
+  name_prefix = "${local.prefix}-waf-uploads-"
+  scope       = "CLOUDFRONT"
+  capacity    = 9 * length(var.upload_paths)
 
   visibility_config {
     cloudwatch_metrics_enabled = true
-    metric_name                = "${local.prefix}-waf-allow-uploads"
+    metric_name                = "${local.prefix}-waf-uploads"
     sampled_requests_enabled   = true
   }
 
@@ -265,5 +265,9 @@ resource "aws_wafv2_rule_group" "uploads" {
       metric_name                = "${local.prefix}-waf-request-xss"
       sampled_requests_enabled   = true
     }
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 }
