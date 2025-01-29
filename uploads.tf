@@ -29,49 +29,17 @@ resource "aws_wafv2_rule_group" "uploads" {
           }
         }
 
-        statement {
-          # If we have more than one upload path, we need to create an OR
-          # statement to match on any of the paths.
-          dynamic "or_statement" {
-            for_each = length(var.upload_paths) > 1 ? [true] : []
+        # Create a NOT statement for each of the upload paths. We'll block the
+        # request if it doesn't match any of the paths.
+        dynamic "statement" {
+          for_each = var.upload_paths
 
-            content {
-              dynamic "statement" {
-                for_each = var.upload_paths
-
-                content {
-                  not_statement {
-                    statement {
-                      byte_match_statement {
-                        positional_constraint = statement.value.constraint
-                        search_string         = statement.value.path
-
-                        field_to_match {
-                          uri_path {}
-                        }
-
-                        text_transformation {
-                          priority = 0
-                          type     = "NONE"
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-
-          #  If we only have one path, we need to use a single NOT statement
-          #  because OR statements require at least two statements.
-          dynamic "not_statement" {
-            for_each = length(var.upload_paths) == 1 ? var.upload_paths : []
-
-            content {
+          content {
+            not_statement {
               statement {
                 byte_match_statement {
-                  positional_constraint = not_statement.value.constraint
-                  search_string         = not_statement.value.path
+                  positional_constraint = statement.value.constraint
+                  search_string         = statement.value.path
 
                   field_to_match {
                     uri_path {}
@@ -86,6 +54,8 @@ resource "aws_wafv2_rule_group" "uploads" {
             }
           }
         }
+
+
       }
     }
 
