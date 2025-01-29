@@ -117,6 +117,12 @@ variable "upload_paths" {
   default     = []
 }
 
+variable "upload_rules_capacity" {
+  type        = number
+  description = "Capacity for the upload rules group. Attempts to determine the capacity if left empty."
+  default     = null
+}
+
 variable "webhooks" {
   type = map(object({
     paths = list(object({
@@ -139,5 +145,11 @@ variable "webhooks" {
 variable "webhooks_priority" {
   type        = number
   description = "Priority for the webhooks rule group. By default, an attempt is made to place it before other rules that block traffic."
+  default     = null
+}
+
+variable "webhook_rules_capacity" {
+  type        = number
+  description = "Capacity for the webhook rules group. Attempts to determine the capacity if left empty."
   default     = null
 }
