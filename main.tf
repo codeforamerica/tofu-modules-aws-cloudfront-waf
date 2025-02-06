@@ -270,6 +270,18 @@ resource "aws_wafv2_web_acl" "waf" {
             }
           }
         }
+
+        dynamic "rule_action_override" {
+          for_each = length(var.upload_paths) > 0 ? [true] : []
+
+          content {
+            name = "GenericLFI_BODY"
+
+            action_to_use {
+              count {}
+            }
+          }
+        }
       }
     }
 
