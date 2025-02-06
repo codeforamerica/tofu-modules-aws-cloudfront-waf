@@ -107,7 +107,12 @@ number is too low.
 > > WAFInvalidParameterException: Error reason: You exceeded the capacity limit
 > > for a rule group or web ACL.
 >
-> this is a good indication that you may need to set the capacity manually.
+> this is a good indication that you may need to set the capacity manually. At
+> the end of this message you should see something like:
+>
+> > field: RULE_GROUP, parameter: **92**
+>
+> In this case, the minimum capacity for the rule group should be `92`.
 
 In order to override the capacity for a rule group, you can specify the WCUs
 through an appropriate variable. For example, to set the capacity for the
