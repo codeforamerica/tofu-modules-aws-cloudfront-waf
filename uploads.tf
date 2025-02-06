@@ -175,7 +175,7 @@ resource "aws_wafv2_rule_group" "uploads" {
   # upload.
   rule {
     name     = "${local.prefix}-waf-request-lfi"
-    priority = 3
+    priority = 4
 
     action {
       block {}
