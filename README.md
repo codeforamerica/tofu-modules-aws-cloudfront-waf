@@ -13,7 +13,7 @@ to match your desired configuration. For example, to create a new distribution
 
 ```hcl
 module "cloudfront_waf" {
-  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.8.2"
+  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.9.0"
 
   project     = "my-project"
   environment = "dev"
@@ -76,7 +76,7 @@ distribution at `www.my-project.org`, you could use the following:
 
 ```hcl
 module "cloudfront_waf" {
-  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.8.2"
+  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.9.0"
 
   project     = "my-project"
   environment = "dev"
@@ -107,7 +107,12 @@ number is too low.
 > > WAFInvalidParameterException: Error reason: You exceeded the capacity limit
 > > for a rule group or web ACL.
 >
-> this is a good indication that you may need to set the capacity manually.
+> this is a good indication that you may need to set the capacity manually. At
+> the end of this message you should see something like:
+>
+> > field: RULE_GROUP, parameter: **92**
+>
+> In this case, the minimum capacity for the rule group should be `92`.
 
 In order to override the capacity for a rule group, you can specify the WCUs
 through an appropriate variable. For example, to set the capacity for the
@@ -155,7 +160,7 @@ Simply specify the headers you want to add in a map. For example:
 
 ```hcl
 module "cloudfront_waf" {
-  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.8.2"
+  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.9.0"
 
   project     = "my-project"
   environment = "dev"
@@ -191,7 +196,7 @@ resource "aws_wafv2_ip_set" "security_scanners" {
 }
 
 module "cloudfront_waf" {
-  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.8.2"
+  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.9.0"
 
   project     = "my-project"
   environment = "staging"
@@ -230,7 +235,7 @@ For example, to rate limit requests to 300 over a 5-minute period:
 
 ```hcl
 module "cloudfront_waf" {
-  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.8.2"
+  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.9.0"
 
   project     = "my-project"
   environment = "staging"
@@ -276,7 +281,7 @@ ensure it comes after the common and SQLi rule sets.
 
 ```hcl
 module "cloudfront_waf" {
-  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.8.2"
+  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.9.0"
 
   project     = "my-project"
   environment = "staging"
@@ -318,7 +323,7 @@ conditions that must be met for the request to be allowed through.
 
 ```hcl
 module "cloudfront_waf" {
-  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.8.2"
+  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.9.0"
 
   project     = "my-project"
   environment = "staging"
