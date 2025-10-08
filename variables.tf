@@ -48,6 +48,12 @@ variable "log_group" {
   description = "CloudWatch log group to send WAF logs to."
 }
 
+variable "origin_alb_arn" {
+  type        = string
+  description = "ARN of the Application Load Balancer this deployment will point to. If set, origin_domain is ignored."
+  default     = null
+}
+
 variable "origin_domain" {
   type        = string
   description = "Origin domain this deployment will point to. Defaults to origin.subdomain.domain."

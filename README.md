@@ -13,7 +13,7 @@ to match your desired configuration. For example, to create a new distribution
 
 ```hcl
 module "cloudfront_waf" {
-  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.9.0"
+  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.10.0"
 
   project     = "my-project"
   environment = "dev"
@@ -76,7 +76,7 @@ distribution at `www.my-project.org`, you could use the following:
 
 ```hcl
 module "cloudfront_waf" {
-  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.9.0"
+  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.10.0"
 
   project     = "my-project"
   environment = "dev"
@@ -136,6 +136,7 @@ webhooks_priority = 100
 | environment            | The environment for the deployment.                                                                                       | `string`       | `"dev"`       | no       |
 | [ip_set_rules]         | Custom IP Set rules for the WAF                                                                                           | `map(object)`  | `{}`          | no       |
 | [rate_limit_rules]     | Rate limiting configuration for the WAF.                                                                                  | `map(object)`  | `{}`          | no       |
+| origin_alb_arn         | ARN of the Application Load Balancer this deployment will point to. If set, `origin_domain` is ignored.                   | `string`       | n/a           | no       |
 | origin_domain          | Fully qualified domain name for the origin. Defaults to `origin.${subdomain}.${domain}`.                                  | `string`       | n/a           | no       |
 | passive                | Enable passive mode for the WAF, counting all requests rather than blocking.                                              | `bool`         | `false`       | no       |
 | request_policy         | Managed request policy to associate with the distribution. See the [managed policies][managed-policies] for valid values. | `string`       | `"AllViewer"` | no       |
@@ -160,7 +161,7 @@ Simply specify the headers you want to add in a map. For example:
 
 ```hcl
 module "cloudfront_waf" {
-  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.9.0"
+  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.10.0"
 
   project     = "my-project"
   environment = "dev"
@@ -196,7 +197,7 @@ resource "aws_wafv2_ip_set" "security_scanners" {
 }
 
 module "cloudfront_waf" {
-  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.9.0"
+  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.10.0"
 
   project     = "my-project"
   environment = "staging"
@@ -235,7 +236,7 @@ For example, to rate limit requests to 300 over a 5-minute period:
 
 ```hcl
 module "cloudfront_waf" {
-  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.9.0"
+  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.10.0"
 
   project     = "my-project"
   environment = "staging"
@@ -281,7 +282,7 @@ ensure it comes after the common and SQLi rule sets.
 
 ```hcl
 module "cloudfront_waf" {
-  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.9.0"
+  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.10.0"
 
   project     = "my-project"
   environment = "staging"
@@ -323,7 +324,7 @@ conditions that must be met for the request to be allowed through.
 
 ```hcl
 module "cloudfront_waf" {
-  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.9.0"
+  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.10.0"
 
   project     = "my-project"
   environment = "staging"
