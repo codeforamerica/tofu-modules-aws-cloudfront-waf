@@ -136,6 +136,7 @@ webhooks_priority = 100
 | environment            | The environment for the deployment.                                                                                       | `string`       | `"dev"`       | no       |
 | [ip_set_rules]         | Custom IP Set rules for the WAF                                                                                           | `map(object)`  | `{}`          | no       |
 | [rate_limit_rules]     | Rate limiting configuration for the WAF.                                                                                  | `map(object)`  | `{}`          | no       |
+| origin_alb_arn         | ARN of the Application Load Balancer this deployment will point to. If set, `origin_domain` is ignored.                   | `string`       | n/a           | no       |
 | origin_domain          | Fully qualified domain name for the origin. Defaults to `origin.${subdomain}.${domain}`.                                  | `string`       | n/a           | no       |
 | passive                | Enable passive mode for the WAF, counting all requests rather than blocking.                                              | `bool`         | `false`       | no       |
 | request_policy         | Managed request policy to associate with the distribution. See the [managed policies][managed-policies] for valid values. | `string`       | `"AllViewer"` | no       |
