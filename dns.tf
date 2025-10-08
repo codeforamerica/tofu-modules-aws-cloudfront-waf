@@ -48,7 +48,7 @@ resource "aws_acm_certificate_validation" "validation" {
 }
 
 resource "aws_lb_listener_certificate" "origin" {
-  # It the origin is an ALB, we need to attach our certificate to its listener
+  # If the origin is an ALB, we need to attach our certificate to its listener
   # so that it properly negotiates TLS with the CloudFront "Host" header.
   for_each = var.origin_alb_arn != null ? toset(["this"]) : toset([])
 
