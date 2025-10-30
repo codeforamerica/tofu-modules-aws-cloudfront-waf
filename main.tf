@@ -21,13 +21,29 @@ resource "aws_cloudfront_distribution" "waf" {
       }
     }
 
-    custom_origin_config {
-      http_port                = 80
-      https_port               = 443
-      origin_keepalive_timeout = 5
-      origin_protocol_policy   = "https-only"
-      origin_read_timeout      = 30
-      origin_ssl_protocols     = ["TLSv1.2"]
+    dynamic "custom_origin_config" {
+      # If we don't have an ALB origin, we need to set up a custom config.
+      for_each = var.origin_alb_arn == null ? toset(["this"]) : toset([])
+
+      content {
+        http_port                = 80
+        https_port               = 443
+        origin_keepalive_timeout = 5
+        origin_protocol_policy   = "https-only"
+        origin_read_timeout      = 30
+        origin_ssl_protocols     = ["TLSv1.2"]
+      }
+    }
+
+    dynamic "vpc_origin_config" {
+      # If we have an ALB origin, we want to use a VPC origin to connect.
+      for_each = var.origin_alb_arn != null ? toset(["this"]) : toset([])
+
+      content {
+        origin_keepalive_timeout = 5
+        origin_read_timeout      = 30
+        vpc_origin_id            = aws_cloudfront_vpc_origin.this["this"].id
+      }
     }
   }
 
@@ -61,10 +77,28 @@ resource "aws_cloudfront_distribution" "waf" {
   }
 
   viewer_certificate {
-    # acm_certificate_arn      = aws_acm_certificate.subdomain.arn
     acm_certificate_arn      = var.certificate_imported ? data.aws_acm_certificate.imported["this"].arn : aws_acm_certificate.subdomain.arn
     ssl_support_method       = "sni-only"
     minimum_protocol_version = "TLSv1.2_2021"
+  }
+
+  tags = merge(local.tags, { Name : local.fqdn })
+}
+
+resource "aws_cloudfront_vpc_origin" "this" {
+  for_each = var.origin_alb_arn != null ? toset(["this"]) : toset([])
+
+  vpc_origin_endpoint_config {
+    name                   = local.prefix
+    arn                    = var.origin_alb_arn
+    http_port              = 80
+    https_port             = 443
+    origin_protocol_policy = "match-viewer"
+
+    origin_ssl_protocols {
+      items    = ["TLSv1.2"]
+      quantity = 1
+    }
   }
 
   tags = local.tags
