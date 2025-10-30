@@ -100,6 +100,8 @@ resource "aws_cloudfront_vpc_origin" "this" {
       quantity = 1
     }
   }
+
+  tags = merge(local.tags, { Name : local.fqdn })
 }
 
 resource "aws_wafv2_web_acl" "waf" {
