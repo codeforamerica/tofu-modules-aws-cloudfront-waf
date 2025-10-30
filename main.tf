@@ -93,7 +93,7 @@ resource "aws_cloudfront_vpc_origin" "this" {
     arn                    = var.origin_alb_arn
     http_port              = 80
     https_port             = 443
-    origin_protocol_policy = "https-only"
+    origin_protocol_policy = "match-viewer"
 
     origin_ssl_protocols {
       items    = ["TLSv1.2"]
