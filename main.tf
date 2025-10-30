@@ -85,6 +85,10 @@ resource "aws_cloudfront_distribution" "waf" {
   tags = merge(local.tags, { Name : local.fqdn })
 }
 
+resource "terraform_data" "prefix" {
+  input = local.prefix
+}
+
 resource "aws_cloudfront_vpc_origin" "this" {
   for_each = var.origin_alb_arn != null ? toset(["this"]) : toset([])
 
@@ -102,6 +106,13 @@ resource "aws_cloudfront_vpc_origin" "this" {
   }
 
   tags = local.tags
+
+  lifecycle {
+    # Name changes don't force a replacement, but will fail if the origin is in
+    # use. We want to force a replacement so that the name is updated properly.
+    create_before_destroy = true
+    replace_triggered_by  = [terraform_data.prefix]
+  }
 }
 
 resource "aws_wafv2_web_acl" "waf" {
