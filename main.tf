@@ -82,7 +82,7 @@ resource "aws_cloudfront_distribution" "waf" {
     minimum_protocol_version = "TLSv1.2_2021"
   }
 
-  tags = local.tags
+  tags = merge(local.tags, { Name : local.fqdn })
 }
 
 resource "aws_cloudfront_vpc_origin" "this" {
@@ -101,7 +101,7 @@ resource "aws_cloudfront_vpc_origin" "this" {
     }
   }
 
-  tags = merge(local.tags, { Name : local.fqdn })
+  tags = local.tags
 }
 
 resource "aws_wafv2_web_acl" "waf" {
