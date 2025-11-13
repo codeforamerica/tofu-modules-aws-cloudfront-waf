@@ -105,7 +105,7 @@ variable "request_policy" {
 variable "subdomain" {
   type        = string
   description = "Subdomain for the distribution. Defaults to the environment."
-  default     = ""
+  default     = null
 }
 
 variable "tags" {

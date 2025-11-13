@@ -1,6 +1,6 @@
 resource "aws_route53_record" "subdomain" {
   zone_id = data.aws_route53_zone.domain.zone_id
-  name    = "${local.subdomain}.${var.domain}"
+  name    = local.fqdn
   type    = "A"
 
   alias {
@@ -13,7 +13,7 @@ resource "aws_route53_record" "subdomain" {
 resource "aws_acm_certificate" "subdomain" {
   # Specify the name rather than referencing the resource directly. This allows
   # us to create the certificate before the DNS record exists.
-  domain_name       = "${local.subdomain}.${var.domain}"
+  domain_name       = local.fqdn
   validation_method = "DNS"
 
   lifecycle {

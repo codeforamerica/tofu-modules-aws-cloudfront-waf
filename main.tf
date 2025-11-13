@@ -2,7 +2,7 @@ resource "aws_cloudfront_distribution" "waf" {
   enabled         = true
   comment         = "Pass traffic through WAF before sending to the origin."
   is_ipv6_enabled = true
-  aliases         = ["${local.subdomain}.${var.domain}"]
+  aliases         = [local.fqdn]
   price_class     = "PriceClass_100"
   web_acl_id      = aws_wafv2_web_acl.waf.arn
 
@@ -50,7 +50,7 @@ resource "aws_cloudfront_distribution" "waf" {
   logging_config {
     include_cookies = false
     bucket          = var.log_bucket
-    prefix          = "cloudfront/${local.subdomain}.${var.domain}"
+    prefix          = "cloudfront/${local.fqdn}"
   }
 
   default_cache_behavior {
@@ -88,6 +88,9 @@ resource "aws_cloudfront_distribution" "waf" {
 resource "terraform_data" "prefix" {
   input = local.prefix
 }
+resource "terraform_data" "origin_alb" {
+  input = var.origin_alb_arn
+}
 
 resource "aws_cloudfront_vpc_origin" "this" {
   for_each = var.origin_alb_arn != null ? toset(["this"]) : toset([])
@@ -108,10 +111,11 @@ resource "aws_cloudfront_vpc_origin" "this" {
   tags = local.tags
 
   lifecycle {
-    # Name changes don't force a replacement, but will fail if the origin is in
-    # use. We want to force a replacement so that the name is updated properly.
+    # Some changes don't force a replacement, but will fail if the origin is in
+    # use. We want to force a replacement so that the origin is updated
+    # properly.
     create_before_destroy = true
-    replace_triggered_by  = [terraform_data.prefix]
+    replace_triggered_by  = [terraform_data.prefix, terraform_data.origin_alb]
   }
 }
 
