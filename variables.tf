@@ -5,13 +5,18 @@ variable "domain" {
 
 variable "certificate_domain" {
   type        = string
-  description = "Domain for the imported certificate, if different from the endpoint. Used in conjunction with certificate_imported."
-  default     = ""
+  description = <<EOF
+    Domain for the imported certificate, if different from the endpoint. Used in
+    conjunction with `certificate_imported`.
+    EOF
+  default     = null
 }
 
 variable "certificate_imported" {
   type        = bool
-  description = "Look up an imported certificate instead of creating a managed one."
+  description = <<EOF
+    Look up an imported certificate instead of creating a managed one.
+    EOF
   default     = false
 }
 
@@ -29,7 +34,7 @@ variable "environment" {
 
 variable "ip_set_rules" {
   type = map(object({
-    name     = optional(string, "")
+    name     = optional(string, null)
     action   = optional(string, "allow")
     priority = optional(number, null)
     arn      = string
@@ -50,19 +55,28 @@ variable "log_group" {
 
 variable "origin_alb_arn" {
   type        = string
-  description = "ARN of the Application Load Balancer this deployment will point to. If set, origin_domain is ignored."
+  description = <<EOF
+    ARN of the Application Load Balancer this deployment will point to. Required
+    unless `use_custom_origin` is set to `true`.
+    EOF
   default     = null
 }
 
 variable "origin_domain" {
   type        = string
-  description = "Origin domain this deployment will point to. Defaults to origin.subdomain.domain."
-  default     = ""
+  description = <<EOF
+    Optional custom origin domain to point to. Defaults to
+    `origin.subdomain.domain`. Only used if `use_custom_origin` is set to
+    `true`.
+    EOF
+  default     = null
 }
 
 variable "passive" {
   type        = bool
-  description = "Enable passive mode for the WAF, counting all requests rather than blocking."
+  description = <<EOF
+    Enable passive mode for the WAF, counting all requests rather than blocking.
+    EOF
   default     = false
 }
 
@@ -73,7 +87,7 @@ variable "project" {
 
 variable "rate_limit_rules" {
   type = map(object({
-    name     = optional(string, "")
+    name     = optional(string, null)
     action   = optional(string, "block")
     limit    = optional(number, 10)
     window   = optional(number, 60)
@@ -98,7 +112,10 @@ variable "request_policy" {
       "Elemental-MediaTailor-PersonalizedManifests",
       "UserAgentRefererHeaders"
     ], var.request_policy)
-    error_message = "Invalid request policy. See https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-managed-origin-request-policies.html"
+    error_message = <<EOF
+      Invalid request policy. See
+      https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-managed-origin-request-policies.html
+      EOF
   }
 }
 
@@ -125,8 +142,20 @@ variable "upload_paths" {
 
 variable "upload_rules_capacity" {
   type        = number
-  description = "Capacity for the upload rules group. Attempts to determine the capacity if left empty."
+  description = <<EOF
+    Capacity for the upload rules group. Attempts to determine the capacity if
+    left empty.
+    EOF
   default     = null
+}
+
+variable "use_custom_origin" {
+  type        = bool
+  description = <<EOF
+    Use a custom origin configuration instead of an ALB. If set to `true`,
+    `origin_alb_arn` must also be set.
+    EOF
+  default     = false
 }
 
 variable "webhooks" {
@@ -150,12 +179,18 @@ variable "webhooks" {
 
 variable "webhooks_priority" {
   type        = number
-  description = "Priority for the webhooks rule group. By default, an attempt is made to place it before other rules that block traffic."
+  description = <<EOF
+    Priority for the webhooks rule group. By default, an attempt is made to
+    place it before other rules that block traffic.
+    EOF
   default     = null
 }
 
 variable "webhook_rules_capacity" {
   type        = number
-  description = "Capacity for the webhook rules group. Attempts to determine the capacity if left empty."
+  description = <<EOF
+    Capacity for the webhook rules group. Attempts to determine the capacity if
+    left empty.
+    EOF
   default     = null
 }
