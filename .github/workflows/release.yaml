@@ -1,6 +1,7 @@
 name: Release New Version
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
@@ -12,6 +13,9 @@ jobs:
     name: Build new release
     runs-on: ubuntu-latest
     if: ${{ !startsWith(github.event.head_commit.message, 'bump:') }}
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - name: Checkout source code
         uses: actions/checkout@v4
@@ -40,6 +44,8 @@ jobs:
     name: Release module
     runs-on: ubuntu-latest
     if: startsWith(github.event.head_commit.message, 'bump:')
+    permissions:
+      contents: write
     steps:
       - name: Checkout source code
         uses: actions/checkout@v4
