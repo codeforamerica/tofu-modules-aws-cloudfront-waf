@@ -1,7 +1,7 @@
 data "aws_acm_certificate" "imported" {
   for_each = var.certificate_imported ? toset(["this"]) : toset([])
 
-  domain      = var.certificate_domain != "" ? var.certificate_domain : local.fqdn
+  domain      = coalesce(var.certificate_domain, local.fqdn)
   statuses    = ["ISSUED"]
   types       = ["IMPORTED"]
   most_recent = true
@@ -25,13 +25,13 @@ data "aws_cloudfront_response_headers_policy" "policy" {
 }
 
 data "aws_lb" "origin" {
-  for_each = var.origin_alb_arn != null ? toset(["this"]) : toset([])
+  for_each = var.use_custom_origin ? toset([]) : toset(["this"])
 
   arn = var.origin_alb_arn
 }
 
 data "aws_lb_listener" "origin" {
-  for_each = var.origin_alb_arn != null ? toset(["this"]) : toset([])
+  for_each = var.use_custom_origin ? toset([]) : toset(["this"])
 
   load_balancer_arn = var.origin_alb_arn
   port              = 443

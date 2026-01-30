@@ -1,13 +1,13 @@
 resource "aws_wafv2_rule_group" "webhooks" {
   for_each = length(var.webhooks) > 0 ? toset(["this"]) : toset([])
 
-  name_prefix = "${local.prefix}-webhooks-"
+  name_prefix = join("-", [local.prefix, "webhooks"])
   scope       = "CLOUDFRONT"
   capacity    = var.webhook_rules_capacity == null ? 50 : var.webhook_rules_capacity
 
   visibility_config {
     cloudwatch_metrics_enabled = true
-    metric_name                = "${local.prefix}-webhooks"
+    metric_name                = join("-", [local.prefix, "webhooks"])
     sampled_requests_enabled   = true
   }
 
@@ -16,11 +16,11 @@ resource "aws_wafv2_rule_group" "webhooks" {
     for_each = var.webhooks
 
     content {
-      name     = "${local.prefix}-webhooks-${rule.key}-label"
+      name     = join("-", [local.prefix, "webhooks", rule.key, "label"])
       priority = index(keys(var.webhooks), rule.key)
 
       rule_label {
-        name = "webhook:${rule.key}"
+        name = join(":", ["webhook", rule.key])
       }
 
       action {
@@ -29,7 +29,7 @@ resource "aws_wafv2_rule_group" "webhooks" {
 
       visibility_config {
         cloudwatch_metrics_enabled = true
-        metric_name                = "${local.prefix}-webhooks-${rule.key}-label"
+        metric_name                = join("-", [local.prefix, "webhooks", rule.key, "label"])
         sampled_requests_enabled   = true
       }
 
@@ -91,7 +91,7 @@ resource "aws_wafv2_rule_group" "webhooks" {
     for_each = var.webhooks
 
     content {
-      name     = "${local.prefix}-webhooks-${rule.key}"
+      name     = join("-", [local.prefix, "webhooks", rule.key])
       priority = index(keys(var.webhooks), rule.key) + length(keys(var.webhooks))
 
       action {
@@ -113,7 +113,7 @@ resource "aws_wafv2_rule_group" "webhooks" {
 
       visibility_config {
         cloudwatch_metrics_enabled = true
-        metric_name                = "${local.prefix}-webhooks-${rule.key}"
+        metric_name                = join("-", [local.prefix, "webhooks", rule.key])
         sampled_requests_enabled   = true
       }
 

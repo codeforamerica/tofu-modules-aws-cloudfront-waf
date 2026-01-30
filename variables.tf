@@ -5,13 +5,18 @@ variable "domain" {
 
 variable "certificate_domain" {
   type        = string
-  description = "Domain for the imported certificate, if different from the endpoint. Used in conjunction with certificate_imported."
-  default     = ""
+  description = <<-EOT
+    Domain for the imported certificate, if different from the endpoint. Used in
+    conjunction with `certificate_imported`.
+    EOT
+  default     = null
 }
 
 variable "certificate_imported" {
   type        = bool
-  description = "Look up an imported certificate instead of creating a managed one."
+  description = <<-EOT
+    Look up an imported certificate instead of creating a managed one.
+    EOT
   default     = false
 }
 
@@ -24,12 +29,12 @@ variable "custom_headers" {
 variable "environment" {
   type        = string
   description = "Environment for the deployment."
-  default     = "dev"
+  default     = "development"
 }
 
 variable "ip_set_rules" {
   type = map(object({
-    name     = optional(string, "")
+    name     = optional(string, null)
     action   = optional(string, "allow")
     priority = optional(number, null)
     arn      = string
@@ -50,19 +55,36 @@ variable "log_group" {
 
 variable "origin_alb_arn" {
   type        = string
-  description = "ARN of the Application Load Balancer this deployment will point to. If set, origin_domain is ignored."
+  description = <<-EOT
+    ARN of the Application Load Balancer this deployment will point to. Required
+    unless `use_custom_origin` is set to `true`.
+    EOT
   default     = null
+
+  validation {
+    condition     = var.use_custom_origin || (var.origin_alb_arn != null && var.origin_alb_arn != "")
+    error_message = <<-EOT
+      origin_alb_arn must be set to a non-empty value unless use_custom_origin
+      is true.
+      EOT
+  }
 }
 
 variable "origin_domain" {
   type        = string
-  description = "Origin domain this deployment will point to. Defaults to origin.subdomain.domain."
-  default     = ""
+  description = <<-EOT
+    Optional custom origin domain to point to. Defaults to
+    `origin.subdomain.domain`. Only used if `use_custom_origin` is set to
+    `true`.
+    EOT
+  default     = null
 }
 
 variable "passive" {
   type        = bool
-  description = "Enable passive mode for the WAF, counting all requests rather than blocking."
+  description = <<-EOT
+    Enable passive mode for the WAF, counting all requests rather than blocking.
+    EOT
   default     = false
 }
 
@@ -73,7 +95,7 @@ variable "project" {
 
 variable "rate_limit_rules" {
   type = map(object({
-    name     = optional(string, "")
+    name     = optional(string, null)
     action   = optional(string, "block")
     limit    = optional(number, 10)
     window   = optional(number, 60)
@@ -98,7 +120,10 @@ variable "request_policy" {
       "Elemental-MediaTailor-PersonalizedManifests",
       "UserAgentRefererHeaders"
     ], var.request_policy)
-    error_message = "Invalid request policy. See https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-managed-origin-request-policies.html"
+    error_message = <<-EOT
+      Invalid request policy. See
+      https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-managed-origin-request-policies.html
+      EOT
   }
 }
 
@@ -125,8 +150,21 @@ variable "upload_paths" {
 
 variable "upload_rules_capacity" {
   type        = number
-  description = "Capacity for the upload rules group. Attempts to determine the capacity if left empty."
+  description = <<-EOT
+    Capacity for the upload rules group. Attempts to determine the capacity if
+    left empty.
+    EOT
   default     = null
+}
+
+variable "use_custom_origin" {
+  type        = bool
+  description = <<-EOT
+    Use a custom origin configuration instead of an ALB origin. When set to
+    `true`, a custom origin is used and `origin_alb_arn` is not required; when
+    set to `false`, an ALB is used and `origin_alb_arn` must be set.
+    EOT
+  default     = false
 }
 
 variable "webhooks" {
@@ -150,12 +188,18 @@ variable "webhooks" {
 
 variable "webhooks_priority" {
   type        = number
-  description = "Priority for the webhooks rule group. By default, an attempt is made to place it before other rules that block traffic."
+  description = <<-EOT
+    Priority for the webhooks rule group. By default, an attempt is made to
+    place it before other rules that block traffic.
+    EOT
   default     = null
 }
 
 variable "webhook_rules_capacity" {
   type        = number
-  description = "Capacity for the webhook rules group. Attempts to determine the capacity if left empty."
+  description = <<-EOT
+    Capacity for the webhook rules group. Attempts to determine the capacity if
+    left empty.
+    EOT
   default     = null
 }

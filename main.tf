@@ -22,8 +22,7 @@ resource "aws_cloudfront_distribution" "waf" {
     }
 
     dynamic "custom_origin_config" {
-      # If we don't have an ALB origin, we need to set up a custom config.
-      for_each = var.origin_alb_arn == null ? toset(["this"]) : toset([])
+      for_each = var.use_custom_origin ? toset(["this"]) : toset([])
 
       content {
         http_port                = 80
@@ -36,8 +35,7 @@ resource "aws_cloudfront_distribution" "waf" {
     }
 
     dynamic "vpc_origin_config" {
-      # If we have an ALB origin, we want to use a VPC origin to connect.
-      for_each = var.origin_alb_arn != null ? toset(["this"]) : toset([])
+      for_each = var.use_custom_origin ? toset([]) : toset(["this"])
 
       content {
         origin_keepalive_timeout = 5
@@ -88,12 +86,13 @@ resource "aws_cloudfront_distribution" "waf" {
 resource "terraform_data" "prefix" {
   input = local.prefix
 }
+
 resource "terraform_data" "origin_alb" {
   input = var.origin_alb_arn
 }
 
 resource "aws_cloudfront_vpc_origin" "this" {
-  for_each = var.origin_alb_arn != null ? toset(["this"]) : toset([])
+  for_each = var.use_custom_origin ? toset([]) : toset(["this"])
 
   vpc_origin_endpoint_config {
     name                   = local.prefix
@@ -133,8 +132,8 @@ resource "aws_wafv2_web_acl" "waf" {
   dynamic "rule" {
     for_each = var.ip_set_rules
     content {
-      name     = rule.value.name != "" ? rule.value.name : "${local.prefix}-${rule.key}"
-      priority = rule.value.priority != null ? rule.value.priority : index(var.ip_set_rules, rule.key)
+      name     = coalesce(rule.value.name, join("-", [local.prefix, "ip", rule.key]))
+      priority = rule.value.priority != null ? rule.value.priority : index(keys(var.ip_set_rules), rule.key)
 
       action {
         dynamic "allow" {
@@ -206,8 +205,8 @@ resource "aws_wafv2_web_acl" "waf" {
   dynamic "rule" {
     for_each = var.rate_limit_rules
     content {
-      name     = rule.value.name != "" ? rule.value.name : "${local.prefix}-rate-${rule.key}"
-      priority = rule.value.priority != null ? rule.value.priority : index(var.ip_set_rules, rule.key) + length(var.ip_set_rules) + 1
+      name     = coalesce(rule.value.name, join("-", [local.prefix, "rate", rule.key]))
+      priority = rule.value.priority != null ? rule.value.priority : index(keys(var.rate_limit_rules), rule.key) + length(var.ip_set_rules) + 1
 
       action {
         dynamic "allow" {
