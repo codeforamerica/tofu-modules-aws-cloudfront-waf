@@ -29,7 +29,7 @@ variable "custom_headers" {
 variable "environment" {
   type        = string
   description = "Environment for the deployment."
-  default     = "dev"
+  default     = "development"
 }
 
 variable "ip_set_rules" {
@@ -55,11 +55,16 @@ variable "log_group" {
 
 variable "origin_alb_arn" {
   type        = string
-  description = <<EOF
+  description = <<-EOF
     ARN of the Application Load Balancer this deployment will point to. Required
     unless `use_custom_origin` is set to `true`.
     EOF
   default     = null
+
+  validation {
+    condition     = var.use_custom_origin || (var.origin_alb_arn != null && var.origin_alb_arn != "")
+    error_message = "origin_alb_arn must be set to a non-empty value unless use_custom_origin is true."
+  }
 }
 
 variable "origin_domain" {
@@ -152,8 +157,9 @@ variable "upload_rules_capacity" {
 variable "use_custom_origin" {
   type        = bool
   description = <<EOF
-    Use a custom origin configuration instead of an ALB. If set to `true`,
-    `origin_alb_arn` must also be set.
+    Use a custom origin configuration instead of an ALB origin. When set to
+    `true`, a custom origin is used and `origin_alb_arn` is not required; when
+    set to `false`, an ALB is used and `origin_alb_arn` must be set.
     EOF
   default     = false
 }

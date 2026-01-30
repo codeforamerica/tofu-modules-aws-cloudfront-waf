@@ -132,7 +132,7 @@ resource "aws_wafv2_web_acl" "waf" {
   dynamic "rule" {
     for_each = var.ip_set_rules
     content {
-      name     = coalesce(rule.value.name, join("-", [local.prefix, rule.key]))
+      name     = coalesce(rule.value.name, join("-", [local.prefix, "ip", rule.key]))
       priority = rule.value.priority != null ? rule.value.priority : index(var.ip_set_rules, rule.key)
 
       action {

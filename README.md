@@ -16,16 +16,16 @@ module "cloudfront_waf" {
   source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=2.0.0"
 
   project        = "my-project"
-  environment    = "dev"
+  environment    = "development"
   domain         = "my-project.org"
   log_bucket     = module.logging.bucket
   origin_alb_arn = module.web.load_balancer_arn
 }
 ```
 
-If you want to point the distrubution at a custom origin, you can set
+If you want to point the distribution at a custom origin, you can set
 `use_custom_origin` to `true`. For example, to use the origin
-`origin.development.my-project.org`, you can use the folllowing:
+`origin.development.my-project.org`, you can use the following:
 
 
 ```hcl
@@ -33,7 +33,7 @@ module "cloudfront_waf" {
   source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=2.0.0"
 
   project           = "my-project"
-  environment       = "dev"
+  environment       = "development"
   domain            = "my-project.org"
   log_bucket        = module.logging.bucket
   use_custom_origin = true
@@ -90,14 +90,14 @@ distribution at `www.my-project.org`, you could use the following:
 > [!NOTE]
 > In this case, when the certificate was imported, the `project` tag would have
 > been set to `my-project` and the `environment` tag would have been set to
-> `dev`.
+> `development`.
 
 ```hcl
 module "cloudfront_waf" {
-  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.10.0"
+  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=2.0.0"
 
   project     = "my-project"
-  environment = "dev"
+  environment = "development"
   domain      = "my-project.org"
   subdomain   = "www"
   log_bucket  = module.logging.bucket
@@ -142,30 +142,30 @@ webhooks_priority = 100
 
 ## Inputs
 
-| Name                   | Description                                                                                                                          | Type           | Default       | Required    |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | -------------- | ------------- | ----------- |
-| domain                 | Primary domain for the distribution. The hosted zone for this domain should be in the same account.                                  | `string`       | n/a           | yes         |
-| log_bucket             | Domain name of the S3 bucket to send logs to.                                                                                        | `string`       | n/a           | yes         |
-| log_group              | CloudWatch log group to send WAF logs to.                                                                                            | `string`       | n/a           | yes         |
-| project                | Project that these resources are supporting.                                                                                         | `string`       | n/a           | yes         |
-| origin_alb_arn         | ARN of the Application Load Balancer this deployment will point to. Required unless `use_custom_origin` is set to `true`.            | `string`       | n/a           | conditional |
-| certificate_domain     | Domain for the imported certificate, if different from the endpoint. Used in conjunction with `certificate_imported`.                | `string`       | `null`        | no          |
-| certificate_imported   | Whether the certificate is imported or managed by ACM.                                                                               | `bool`         | `false`       | no          |
-| [custom_headers]       | Custom headers to send to the origin.                                                                                                | `map(string)`  | `{}`          | no          |
-| environment            | The environment for the deployment.                                                                                                  | `string`       | `"dev"`       | no          |
-| [ip_set_rules]         | Custom IP Set rules for the WAF                                                                                                      | `map(object)`  | `{}`          | no          |
-| [rate_limit_rules]     | Rate limiting configuration for the WAF.                                                                                             | `map(object)`  | `{}`          | no          |
-| origin_domain          | Optional custom origin domain to point to. Defaults to `origin.subdomain.domain`. Only used if `use_custom_origin` is set to `true`. | `string`       | n/a           | no          |
-| passive                | Enable passive mode for the WAF, counting all requests rather than blocking.                                                         | `bool`         | `false`       | no          |
-| request_policy         | Managed request policy to associate with the distribution. See the [managed policies][managed-policies] for valid values.            | `string`       | `"AllViewer"` | no          |
-| subdomain              | Subdomain for the distribution. Defaults to the environment.                                                                         | `string`       | n/a           | no          |
-| tags                   | Optional tags to be applied to all resources.                                                                                        | `map(string)`  | `{}`          | no          |
-| [upload_paths]         | Optional paths to allow uploads to.                                                                                                  | `list(object)` | `[]`          | no          |
-| upload_rules_capacity  | Capacity for the upload rules group. Attempts to determine the capacity if left empty.                                               | `number`       | `null`        | no          |
-| use_custom_origin      | Use a custom origin configuration instead of an ALB. If set to `true`, `origin_alb_arn` must also be set.                            | `bool`         | `false`       | no          |
-| [webhooks]             | Optional map of webhooks that should be allowed through the WAF.                                                                     | `map(object)`  | `{}`          | no          |
-| webhooks_priority      | Priority for the webhooks rule group. By default, an attempt is made to place it before other rules that block traffic.              | `number`       | `null`        | no          |
-| webhook_rules_capacity | Capacity for the webhook rules group. Attempts to determine the capacity if left empty.                                              | `number`       | `null`        | no          |
+| Name                   | Description                                                                                                                                                                                                         | Type           | Default         | Required    |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------- | --------------- | ----------- |
+| domain                 | Primary domain for the distribution. The hosted zone for this domain should be in the same account.                                                                                                                 | `string`       | n/a             | yes         |
+| log_bucket             | Domain name of the S3 bucket to send logs to.                                                                                                                                                                       | `string`       | n/a             | yes         |
+| log_group              | CloudWatch log group to send WAF logs to.                                                                                                                                                                           | `string`       | n/a             | yes         |
+| project                | Project that these resources are supporting.                                                                                                                                                                        | `string`       | n/a             | yes         |
+| origin_alb_arn         | ARN of the Application Load Balancer this deployment will point to. Required unless `use_custom_origin` is set to `true`.                                                                                           | `string`       | n/a             | conditional |
+| certificate_domain     | Domain for the imported certificate, if different from the endpoint. Used in conjunction with `certificate_imported`.                                                                                               | `string`       | `null`          | no          |
+| certificate_imported   | Whether the certificate is imported or managed by ACM.                                                                                                                                                              | `bool`         | `false`         | no          |
+| [custom_headers]       | Custom headers to send to the origin.                                                                                                                                                                               | `map(string)`  | `{}`            | no          |
+| environment            | The environment for the deployment.                                                                                                                                                                                 | `string`       | `"development"` | no          |
+| [ip_set_rules]         | Custom IP Set rules for the WAF                                                                                                                                                                                     | `map(object)`  | `{}`            | no          |
+| [rate_limit_rules]     | Rate limiting configuration for the WAF.                                                                                                                                                                            | `map(object)`  | `{}`            | no          |
+| origin_domain          | Optional custom origin domain to point to. Defaults to `origin.subdomain.domain`. Only used if `use_custom_origin` is set to `true`.                                                                                | `string`       | n/a             | no          |
+| passive                | Enable passive mode for the WAF, counting all requests rather than blocking.                                                                                                                                        | `bool`         | `false`         | no          |
+| request_policy         | Managed request policy to associate with the distribution. See the [managed policies][managed-policies] for valid values.                                                                                           | `string`       | `"AllViewer"`   | no          |
+| subdomain              | Subdomain for the distribution. Defaults to the environment.                                                                                                                                                        | `string`       | n/a             | no          |
+| tags                   | Optional tags to be applied to all resources.                                                                                                                                                                       | `map(string)`  | `{}`            | no          |
+| [upload_paths]         | Optional paths to allow uploads to.                                                                                                                                                                                 | `list(object)` | `[]`            | no          |
+| upload_rules_capacity  | Capacity for the upload rules group. Attempts to determine the capacity if left empty.                                                                                                                              | `number`       | `null`          | no          |
+| use_custom_origin      | Use a custom origin configuration instead of an ALB origin. When set to `true`, a custom origin is used and `origin_alb_arn` is not required; when set to `false`, an ALB is used and `origin_alb_arn` must be set. | `bool`         | `false`         | no          |
+| [webhooks]             | Optional map of webhooks that should be allowed through the WAF.                                                                                                                                                    | `map(object)`  | `{}`            | no          |
+| webhooks_priority      | Priority for the webhooks rule group. By default, an attempt is made to place it before other rules that block traffic.                                                                                             | `number`       | `null`          | no          |
+| webhook_rules_capacity | Capacity for the webhook rules group. Attempts to determine the capacity if left empty.                                                                                                                             | `number`       | `null`          | no          |
 
 ### custom_headers
 
@@ -180,10 +180,10 @@ Simply specify the headers you want to add in a map. For example:
 
 ```hcl
 module "cloudfront_waf" {
-  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.10.0"
+  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=2.0.0"
 
   project     = "my-project"
-  environment = "dev"
+  environment = "development"
   domain      = "my-project.org"
   log_bucket  = module.logging.bucket
 
@@ -216,7 +216,7 @@ resource "aws_wafv2_ip_set" "security_scanners" {
 }
 
 module "cloudfront_waf" {
-  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.10.0"
+  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=2.0.0"
 
   project     = "my-project"
   environment = "staging"
@@ -238,7 +238,7 @@ module "cloudfront_waf" {
 | -------- | ----------------------------------------------------------------------------- | -------- | --------- | -------- |
 | action   | The action to perform.                                                        | `string` | `"allow"` | no       |
 | arn      | ARN of the IP set to match on.                                                | `string` | n/a       | yes      |
-| name     | Name for this rule. Defaults to `${project}-${environment}-rate-${rule.key}`. | `string` | `null`    | no       |
+| name     | Name for this rule. Defaults to `${project}-${environment}-ip-${rule.key}`. | `string` | `null`    | no       |
 | priority | Rule priority. Defaults to the rule's position in the map.                    | `number` | `null`    | no       |
 
 ### rate_limit_rules
@@ -255,7 +255,7 @@ For example, to rate limit requests to 300 over a 5-minute period:
 
 ```hcl
 module "cloudfront_waf" {
-  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.10.0"
+  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=2.0.0"
 
   project     = "my-project"
   environment = "staging"
@@ -301,7 +301,7 @@ ensure it comes after the common and SQLi rule sets.
 
 ```hcl
 module "cloudfront_waf" {
-  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.10.0"
+  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=2.0.0"
 
   project     = "my-project"
   environment = "staging"
@@ -343,7 +343,7 @@ conditions that must be met for the request to be allowed through.
 
 ```hcl
 module "cloudfront_waf" {
-  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=1.10.0"
+  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=2.0.0"
 
   project     = "my-project"
   environment = "staging"
