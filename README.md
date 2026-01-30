@@ -382,7 +382,7 @@ path matching).
 For each webhook, you can optionally specify one or more `criteria` that must be
 met for the request to be allowed. This can be used to check for specific
 headers, query parameters, or other request attributes that are expected for a
-valid request. If not criteria are specified, any requests matching the paths
+valid request. If no criteria are specified, any requests matching the paths
 will be allowed through.
 
 | Name                          | Description                                                                                            | Type           | Default   | Required |

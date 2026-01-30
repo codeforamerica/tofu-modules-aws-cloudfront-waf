@@ -133,7 +133,7 @@ resource "aws_wafv2_web_acl" "waf" {
     for_each = var.ip_set_rules
     content {
       name     = coalesce(rule.value.name, join("-", [local.prefix, "ip", rule.key]))
-      priority = rule.value.priority != null ? rule.value.priority : index(var.ip_set_rules, rule.key)
+      priority = rule.value.priority != null ? rule.value.priority : index(keys(var.ip_set_rules), rule.key)
 
       action {
         dynamic "allow" {
@@ -206,7 +206,7 @@ resource "aws_wafv2_web_acl" "waf" {
     for_each = var.rate_limit_rules
     content {
       name     = coalesce(rule.value.name, join("-", [local.prefix, "rate", rule.key]))
-      priority = rule.value.priority != null ? rule.value.priority : index(var.ip_set_rules, rule.key) + length(var.ip_set_rules) + 1
+      priority = rule.value.priority != null ? rule.value.priority : index(keys(var.rate_limit_rules), rule.key) + length(var.ip_set_rules) + 1
 
       action {
         dynamic "allow" {
