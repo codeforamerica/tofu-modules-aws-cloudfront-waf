@@ -1,6 +1,6 @@
 # CloudFront WAF Module
 
-[![Main Checks][badge-checks]][code-checks] [![GitHub Release][badge-release]][latest-release]
+[![GitHub Release][badge-release]][latest-release]
 
 This module creates a CloudFront [distribution] that passes traffic through a
 Web Application Firewall (WAF) _without_ caching.
@@ -410,10 +410,8 @@ will be allowed through.
 
 [acm]: https://aws.amazon.com/certificate-manager/
 [acm-import]: https://docs.aws.amazon.com/acm/latest/userguide/import-certificate.html
-[badge-checks]: https://github.com/codeforamerica/tofu-modules-aws-cloudfront-waf/actions/workflows/main.yaml/badge.svg
 [badge-release]: https://img.shields.io/github/v/release/codeforamerica/tofu-modules-aws-cloudfront-waf?logo=github&label=Latest%20Release
 [cloudfront-headers]: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/add-origin-custom-headers.html#add-origin-custom-headers-denylist
-[code-checks]: https://github.com/codeforamerica/tofu-modules-aws-cloudfront-waf/actions/workflows/main.yaml
 [constraints]: https://docs.aws.amazon.com/waf/latest/APIReference/API_ByteMatchStatement.html
 [custom_headers]: #custom_headers
 [distribution]: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/distribution-working-with.html
