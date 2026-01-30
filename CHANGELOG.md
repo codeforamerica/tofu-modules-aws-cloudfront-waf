@@ -2,11 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
-and this project adheres to
-[Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+The format is based on [Keep a Changelog][changelog], and this project adheres
+to [Semantic Versioning][semver].
 
 ## 2.0.0 (2026-01-30)
+
+> [!WARNING]
+> This release introduces a breaking change.
+>
+> If you're currently using this module with a **custom origin**, please review
+> the updated [README] to ensure your configuration matches the new requirements
+> to enable a custom origin.
 
 ### Feat
 
@@ -124,3 +130,7 @@ and this project adheres to
 ### Feat
 
 - Initial release. (#1)
+
+[changelog]: https://keepachangelog.com/en/1.1.0/
+[readme]: README.md
+[semver]: https://semver.org/spec/v2.0.0.html
