@@ -32,6 +32,12 @@ variable "environment" {
   default     = "development"
 }
 
+variable "hosted_zone_id" {
+  type        = string
+  description = "ID of the hosted zone for the domain, leave empty to have this module look it up."
+  default     = null
+}
+
 variable "ip_set_rules" {
   type = map(object({
     name     = optional(string, null)

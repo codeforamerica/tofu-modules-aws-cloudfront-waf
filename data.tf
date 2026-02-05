@@ -38,5 +38,7 @@ data "aws_lb_listener" "origin" {
 }
 
 data "aws_route53_zone" "domain" {
+  for_each = var.hosted_zone_id == null ? toset(["this"]) : toset([])
+
   name = var.domain
 }
