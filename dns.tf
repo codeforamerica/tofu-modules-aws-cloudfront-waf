@@ -1,11 +1,11 @@
 resource "aws_route53_record" "subdomain" {
-  zone_id = data.aws_route53_zone.domain.zone_id
+  zone_id = local.hosted_zone_id
   name    = local.fqdn
   type    = "A"
 
   alias {
     name                   = aws_cloudfront_distribution.waf.domain_name
-    zone_id                = aws_cloudfront_distribution.waf.hosted_zone_id
+    zone_id                = local.hosted_zone_id
     evaluate_target_health = false
   }
 }
@@ -37,7 +37,7 @@ resource "aws_route53_record" "validation" {
   records         = [each.value.record]
   ttl             = 300
   type            = each.value.type
-  zone_id         = data.aws_route53_zone.domain.zone_id
+  zone_id         = local.hosted_zone_id
 }
 
 resource "aws_acm_certificate_validation" "validation" {
