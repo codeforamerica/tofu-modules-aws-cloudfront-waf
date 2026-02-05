@@ -1,5 +1,6 @@
 locals {
   fqdn      = join(".", compact([local.subdomain, var.domain]))
+  hosted_zone_id    = var.hosted_zone_id == null ? data.aws_route53_zone.domain["this"].zone_id : var.hosted_zone_id
   subdomain = var.subdomain != null ? var.subdomain : var.environment
   prefix    = join("-", compact([var.project, var.environment]))
   tags      = merge(var.tags, { domain : local.fqdn })
