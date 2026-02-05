@@ -5,7 +5,7 @@ resource "aws_route53_record" "subdomain" {
 
   alias {
     name                   = aws_cloudfront_distribution.waf.domain_name
-    zone_id                = local.hosted_zone_id
+    zone_id                = aws_cloudfront_distribution.waf.hosted_zone_id
     evaluate_target_health = false
   }
 }
