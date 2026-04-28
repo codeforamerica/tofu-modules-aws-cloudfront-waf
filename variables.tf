@@ -111,6 +111,42 @@ variable "rate_limit_rules" {
   default     = {}
 }
 
+variable "redacted_headers" {
+  type = map(string)
+  description = <<-EOT
+    Headers to redact from logs. Keys are the header names, and values are the
+    action to take. Valid actions are `"HASH"` and `"SUBSTITUTION"`.
+    EOT
+  default = {
+    # Hash these so repeated tokens can be correlated across requests.
+    "authorization"            = "HASH"
+    "proxy-authorization"      = "HASH"
+    "cookie"                   = "HASH"
+    "x-api-key"                = "HASH"
+    "x-amz-security-token"     = "HASH"
+    "x-auth-token"             = "HASH"
+    "x-access-token"           = "HASH"
+    "x-id-token"               = "HASH"
+    "x-refresh-token"          = "HASH"
+    "x-session-token"          = "HASH"
+    "x-session-id"             = "HASH"
+    "x-amzn-oidc-data"         = "HASH"
+    "x-amzn-oidc-accesstoken"  = "HASH"
+    "x-forwarded-access-token" = "HASH"
+
+    # Substitute these, no need to hash for correlation.
+    "x-forwarded-user"  = "SUBSTITUTION"
+    "x-forwarded-email" = "SUBSTITUTION"
+    "x-csrf-token"      = "SUBSTITUTION"
+    "x-xsrf-token"      = "SUBSTITUTION"
+  }
+
+  validation {
+    condition     = alltrue([for h in values(var.redacted_headers) : contains(["HASH", "SUBSTITUTION"], h)])
+    error_message = "Each value must be either \"HASH\" or \"SUBSTITUTION\"."
+  }
+}
+
 variable "request_policy" {
   type        = string
   description = "Managed request policy to associate with the distribution."
