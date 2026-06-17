@@ -63,6 +63,57 @@ resource "aws_wafv2_web_acl" "waf" {
     }
   }
 
+  dynamic "rule" {
+    for_each = var.geo_match_rules
+    content {
+      name     = coalesce(rule.value.name, join("-", [local.prefix, "geo", rule.key]))
+      priority = rule.value.priority != null ? rule.value.priority : index(keys(var.geo_match_rules), rule.key) + length(var.ip_set_rules) + 1
+
+      action {
+        dynamic "allow" {
+          for_each = rule.value.action == "allow" ? [true] : []
+          content {}
+        }
+
+        dynamic "block" {
+          for_each = rule.value.action == "block" && !var.passive ? [true] : []
+          content {}
+        }
+
+        dynamic "count" {
+          for_each = rule.value.action == "count" || (rule.value.action == "block" && var.passive) ? [true] : []
+          content {}
+        }
+      }
+
+      statement {
+        dynamic "not_statement" {
+          for_each = rule.value.negate ? [true] : []
+          content {
+            statement {
+              geo_match_statement {
+                country_codes = rule.value.country_codes
+              }
+            }
+          }
+        }
+
+        dynamic "geo_match_statement" {
+          for_each = rule.value.negate ? [] : [true]
+          content {
+            country_codes = rule.value.country_codes
+          }
+        }
+      }
+
+      visibility_config {
+        cloudwatch_metrics_enabled = true
+        metric_name                = "${local.prefix}-waf-geo-${rule.key}"
+        sampled_requests_enabled   = true
+      }
+    }
+  }
+
   # Attach the webhooks rule group to the WAF, if one was created.
   dynamic "rule" {
     for_each = length(var.webhooks) > 0 ? [true] : []

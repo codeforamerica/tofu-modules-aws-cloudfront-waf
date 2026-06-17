@@ -32,6 +32,23 @@ variable "environment" {
   default     = "development"
 }
 
+variable "geo_match_rules" {
+  type = map(object({
+    name          = optional(string, null)
+    action        = optional(string, "count")
+    priority      = optional(number, null)
+    country_codes = list(string)
+    negate        = optional(bool, false)
+  }))
+  description = "Geographic match rules for the WAF."
+  default     = {}
+
+  validation {
+    condition     = alltrue([for r in values(var.geo_match_rules) : contains(["allow", "block", "count"], r.action)])
+    error_message = "Each action must be \"allow\", \"block\", or \"count\"."
+  }
+}
+
 variable "hosted_zone_id" {
   type        = string
   description = "ID of the hosted zone for the domain, leave empty to have this module look it up."
