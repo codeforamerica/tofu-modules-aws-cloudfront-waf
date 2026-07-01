@@ -63,7 +63,17 @@ these rules are spaced out to allow for custom rules to be inserted between.
 | [AWSManagedRulesAmazonIpReputationList][rules-ip-rep] | 200      | Protects against IP addresses with a poor reputation. |
 | [AWSManagedRulesCommonRuleSet][rules-common]          | 300      | Protects against common threats.                      |
 | [AWSManagedRulesKnownBadInputsRuleSet][rules-inputs]  | 400      | Protects against known bad inputs.                    |
+| [AWSManagedRulesBotControlRuleSet][rules-bot-control] | 450      | (Optional, off by default) Protects against bots.     |
 | [AWSManagedRulesSQLiRuleSet][rules-sqli]              | 500      | Protects against SQL injection attacks.               |
+
+The bot control rule set can be enabled as follows, at either TARGETED or COMMON inspection level:
+
+```hcl
+bot_control = {
+  enable           = true
+  inspection_level = "TARGETED"
+}
+```
 
 ## SSL Certificates
 
@@ -428,6 +438,7 @@ will be allowed through.
 [rules-common]: https://docs.aws.amazon.com/waf/latest/developerguide/aws-managed-rule-groups-baseline.html#aws-managed-rule-groups-baseline-crs
 [rules-inputs]: https://docs.aws.amazon.com/waf/latest/developerguide/aws-managed-rule-groups-baseline.html#aws-managed-rule-groups-baseline-known-bad-inputs
 [rules-ip-rep]: https://docs.aws.amazon.com/waf/latest/developerguide/aws-managed-rule-groups-ip-rep.html#aws-managed-rule-groups-ip-rep-amazon
+[rules-bot-control]: https://docs.aws.amazon.com/waf/latest/developerguide/aws-managed-rule-groups-bot-control.html
 [rules-sqli]: https://docs.aws.amazon.com/waf/latest/developerguide/aws-managed-rule-groups-use-case.html#aws-managed-rule-groups-use-case-sql-db
 [upload_paths]: #upload_paths
 [wafv2_ip_set]: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/wafv2_ip_set
