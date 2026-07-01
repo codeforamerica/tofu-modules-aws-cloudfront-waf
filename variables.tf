@@ -90,7 +90,6 @@ variable "bot_control" {
   type = object({
     enable           = optional(bool, false)
     inspection_level = optional(string, "COMMON")
-    priority         = optional(number, 700)
   })
   description = "Bot Control managed rule group configuration."
   default     = {}
