@@ -86,6 +86,20 @@ variable "origin_domain" {
   default     = null
 }
 
+variable "bot_control" {
+  type = object({
+    enable           = optional(bool, false)
+    inspection_level = optional(string, "COMMON")
+  })
+  description = "Bot Control managed rule group configuration."
+  default     = {}
+
+  validation {
+    condition     = contains(["COMMON", "TARGETED"], var.bot_control.inspection_level)
+    error_message = "inspection_level must be either \"COMMON\" or \"TARGETED\"."
+  }
+}
+
 variable "passive" {
   type        = bool
   description = <<-EOT
