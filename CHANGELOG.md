@@ -5,11 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog][changelog], and this project adheres
 to [Semantic Versioning][semver].
 
-## 2.3.0 (2026-07-01)
+## 2.4.0 (2026-07-01)
 
 ### Feat
 
 - Support path-based redirects via ordered cache behaviors.
+
+## 2.3.0 (2026-07-01)
+
+### Feat
+
+- Add optional Bot Control managed rule set. (#47)
 
 ## 2.2.0 (2026-04-28)
 
