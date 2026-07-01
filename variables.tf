@@ -209,6 +209,19 @@ variable "use_custom_origin" {
   default     = false
 }
 
+variable "redirect_paths" {
+  type = list(object({
+    path_pattern = string
+    function_arn = string
+  }))
+  description = <<-EOT
+    Ordered cache behaviors for path-based redirects. Each entry attaches a
+    CloudFront function that performs the redirect for requests matching the
+    given path pattern.
+    EOT
+  default     = []
+}
+
 variable "webhooks" {
   type = map(object({
     paths = list(object({
