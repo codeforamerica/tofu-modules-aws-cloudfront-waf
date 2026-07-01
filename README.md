@@ -167,6 +167,7 @@ webhooks_priority = 100
 | [ip_set_rules]         | Custom IP Set rules for the WAF                                                                                                                                                                                     | `map(object)`  | `{}`              | no          |
 | redacted_headers       | Headers to redact from logs. Keys are the header names, and values are the action to take. Valid actions are `"HASH"` and `"SUBSTITUTION"`.                                                                         | `map(string)`  | `{sane defaults}` | no          |
 | [rate_limit_rules]     | Rate limiting configuration for the WAF.                                                                                                                                                                            | `map(object)`  | `{}`              | no          |
+| [redirect_paths]       | Ordered cache behaviors for path-based redirects. Each entry attaches a CloudFront function that performs the redirect for requests matching the given path pattern.                                                 | `list(object)` | `[]`              | no          |
 | origin_domain          | Optional custom origin domain to point to. Defaults to `origin.subdomain.domain`. Only used if `use_custom_origin` is set to `true`.                                                                                | `string`       | n/a               | no          |
 | passive                | Enable passive mode for the WAF, counting all requests rather than blocking.                                                                                                                                        | `bool`         | `false`           | no          |
 | request_policy         | Managed request policy to associate with the distribution. See the [managed policies][managed-policies] for valid values.                                                                                           | `string`       | `"AllViewer"`     | no          |
@@ -292,6 +293,41 @@ module "cloudfront_waf" {
 | limit    | The number of requests allowed within the window. Minimum value of 10.                  | `number` | `10`      | no       |
 | priority | Rule priority. Defaults to the rule's position in the map + the number of IP set rules. | `number` | `null`    | no       |
 | window   | Number of seconds to limit requests in. Options are: 60, 120, 300, 600                  | `number` | `60`      | no       |
+
+### redirect_paths
+
+To redirect traffic from a specific path to another URL, you can specify a list
+of path-based redirect behaviors. Each entry creates an [ordered cache
+behavior][ordered-behaviors] that fires a CloudFront function before the request
+reaches the origin.
+
+> [!TIP]
+> Use the [`tofu-modules-aws-cloudfront-redirect`][cloudfront-redirect] module
+> with `create_distribution = false` to create the CloudFront function, then
+> pass the `function_arn` output here.
+
+```hcl
+module "cloudfront_waf" {
+  source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=2.3.0"
+
+  project     = "my-project"
+  environment = "staging"
+  domain      = "my-project.org"
+  log_bucket  = module.logging.bucket
+
+  redirect_paths = [
+    {
+      path_pattern = "/old-path*"
+      function_arn = module.redirect.function_arn
+    }
+  ]
+}
+```
+
+| Name         | Description                                                                    | Type     | Default | Required |
+| ------------ | ------------------------------------------------------------------------------ | -------- | ------- | -------- |
+| path_pattern | CloudFront path pattern to match (e.g. `/old-path*`).                          | `string` | n/a     | yes      |
+| function_arn | ARN of the CloudFront function to fire on `viewer-request` for matching paths. | `string` | n/a     | yes      |
 
 ### upload_paths
 
@@ -433,7 +469,10 @@ will be allowed through.
 [ip_set_rules]: #ip_set_rules
 [latest-release]: https://github.com/codeforamerica/tofu-modules-aws-cloudfront-waf/releases/latest
 [managed-policies]: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-managed-origin-request-policies.html
+[cloudfront-redirect]: https://github.com/codeforamerica/tofu-modules-aws-cloudfront-redirect
+[ordered-behaviors]: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/distribution-web-values-specify.html#DownloadDistValuesPathPattern
 [rate_limit_rules]: #rate_limit_rules
+[redirect_paths]: #redirect_paths
 [route53]: https://aws.amazon.com/route53/
 [rules-common]: https://docs.aws.amazon.com/waf/latest/developerguide/aws-managed-rule-groups-baseline.html#aws-managed-rule-groups-baseline-crs
 [rules-inputs]: https://docs.aws.amazon.com/waf/latest/developerguide/aws-managed-rule-groups-baseline.html#aws-managed-rule-groups-baseline-known-bad-inputs

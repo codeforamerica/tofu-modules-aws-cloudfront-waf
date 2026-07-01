@@ -67,6 +67,27 @@ resource "aws_cloudfront_distribution" "waf" {
     viewer_protocol_policy = "redirect-to-https"
   }
 
+  dynamic "ordered_cache_behavior" {
+    for_each = var.redirect_paths
+
+    content {
+      path_pattern           = ordered_cache_behavior.value.path_pattern
+      allowed_methods        = ["GET", "HEAD"]
+      cached_methods         = ["GET", "HEAD"]
+      target_origin_id       = local.origin_domain
+      viewer_protocol_policy = "redirect-to-https"
+      min_ttl                = 0
+      default_ttl            = 0
+      max_ttl                = 0
+      cache_policy_id        = data.aws_cloudfront_cache_policy.policy.id
+
+      function_association {
+        event_type   = "viewer-request"
+        function_arn = ordered_cache_behavior.value.function_arn
+      }
+    }
+  }
+
   restrictions {
     geo_restriction {
       restriction_type = "none"
