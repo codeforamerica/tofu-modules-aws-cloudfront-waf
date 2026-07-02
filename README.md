@@ -75,6 +75,28 @@ bot_control = {
 }
 ```
 
+By default, every Bot Control sub-rule uses AWS's built-in action (block for most
+signals). To set a custom action per sub-rule instead (`allow`, `block`, `captcha`,
+`challenge`, or `count`), use `rule_actions`. This is useful for gradually
+rolling out bot control, e.g. by counting instead of blocking while you evaluate
+false positives:
+
+```hcl
+bot_control = {
+  enable           = true
+  inspection_level = "TARGETED"
+
+  rule_actions = {
+    TGT_VolumetricIpTokenAbsent = "count"
+    TGT_VolumetricSession       = "count"
+    CategoryAdvertising         = "count"
+  }
+}
+```
+
+See the [AWS Bot Control rule groups documentation][rules-bot-control] for the full
+list of sub-rule names available at each inspection level.
+
 ## SSL Certificates
 
 By default, this module will use [AWS Certificate Manager][acm] (ACM) to manage
