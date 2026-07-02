@@ -98,7 +98,7 @@ resource "aws_cloudfront_distribution" "waf" {
   viewer_certificate {
     acm_certificate_arn      = var.certificate_imported ? data.aws_acm_certificate.imported["this"].arn : aws_acm_certificate.subdomain.arn
     ssl_support_method       = "sni-only"
-    minimum_protocol_version = "TLSv1.2_2021"
+    minimum_protocol_version = var.minimum_protocol_version
   }
 
   tags = merge(local.tags, { Name : local.fqdn })
