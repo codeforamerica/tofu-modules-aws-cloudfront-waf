@@ -59,6 +59,23 @@ variable "log_group" {
   description = "CloudWatch log group to send WAF logs to."
 }
 
+variable "minimum_protocol_version" {
+  type        = string
+  description = "Minimum CloudWatch TLS security policy."
+  default     = "TLSv1.2_2025"
+
+  validation {
+    condition = contains(
+      ["TLSv1.2_2021", "TLSv1.2_2025", "TLSv1.3_2025"],
+      var.minimum_protocol_version
+    )
+    error_message = <<-EOT
+      Minimum protocol version must be one of: TLSv1.2_2021, TLSv1.2_2025,
+      TLSv1.3_2025
+    EOT
+  }
+}
+
 variable "origin_alb_arn" {
   type        = string
   description = <<-EOT
