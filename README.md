@@ -27,7 +27,6 @@ If you want to point the distribution at a custom origin, you can set
 `use_custom_origin` to `true`. For example, to use the origin
 `origin.development.my-project.org`, you can use the following:
 
-
 ```hcl
 module "cloudfront_waf" {
   source = "github.com/codeforamerica/tofu-modules-aws-cloudfront-waf?ref=2.0.0"
@@ -59,7 +58,7 @@ The WAF is configured with the following managed rules groups. The priorities of
 these rules are spaced out to allow for custom rules to be inserted between.
 
 | Rule Group Name                                       | Priority | Description                                           |
-| ----------------------------------------------------- | -------- | ----------------------------------------------------- |
+|-------------------------------------------------------|----------|-------------------------------------------------------|
 | [AWSManagedRulesAmazonIpReputationList][rules-ip-rep] | 200      | Protects against IP addresses with a poor reputation. |
 | [AWSManagedRulesCommonRuleSet][rules-common]          | 300      | Protects against common threats.                      |
 | [AWSManagedRulesKnownBadInputsRuleSet][rules-inputs]  | 400      | Protects against known bad inputs.                    |
@@ -174,33 +173,34 @@ webhooks_priority = 100
 
 ## Inputs
 
-| Name                   | Description                                                                                                                                                                                                         | Type           | Default           | Required    |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------- | ----------------- | ----------- |
-| domain                 | Primary domain for the distribution. The hosted zone for this domain should be in the same account.                                                                                                                 | `string`       | n/a               | yes         |
-| log_bucket             | Domain name of the S3 bucket to send logs to.                                                                                                                                                                       | `string`       | n/a               | yes         |
-| log_group              | CloudWatch log group to send WAF logs to.                                                                                                                                                                           | `string`       | n/a               | yes         |
-| project                | Project that these resources are supporting.                                                                                                                                                                        | `string`       | n/a               | yes         |
-| origin_alb_arn         | ARN of the Application Load Balancer this deployment will point to. Required unless `use_custom_origin` is set to `true`.                                                                                           | `string`       | n/a               | conditional |
-| certificate_domain     | Domain for the imported certificate, if different from the endpoint. Used in conjunction with `certificate_imported`.                                                                                               | `string`       | `null`            | no          |
-| certificate_imported   | Whether the certificate is imported or managed by ACM.                                                                                                                                                              | `bool`         | `false`           | no          |
-| [custom_headers]       | Custom headers to send to the origin.                                                                                                                                                                               | `map(string)`  | `{}`              | no          |
-| environment            | The environment for the deployment.                                                                                                                                                                                 | `string`       | `"development"`   | no          |
-| hosted_zone_id         | ID of the hosted zone for the domain, leave empty to have this module look it up.                                                                                                                                   | `string`       | `null`            | no          |
-| [ip_set_rules]         | Custom IP Set rules for the WAF                                                                                                                                                                                     | `map(object)`  | `{}`              | no          |
-| redacted_headers       | Headers to redact from logs. Keys are the header names, and values are the action to take. Valid actions are `"HASH"` and `"SUBSTITUTION"`.                                                                         | `map(string)`  | `{sane defaults}` | no          |
-| [rate_limit_rules]     | Rate limiting configuration for the WAF.                                                                                                                                                                            | `map(object)`  | `{}`              | no          |
-| [redirect_paths]       | Ordered cache behaviors for path-based redirects. Each entry attaches a CloudFront function that performs the redirect for requests matching the given path pattern.                                                 | `list(object)` | `[]`              | no          |
-| origin_domain          | Optional custom origin domain to point to. Defaults to `origin.subdomain.domain`. Only used if `use_custom_origin` is set to `true`.                                                                                | `string`       | n/a               | no          |
-| passive                | Enable passive mode for the WAF, counting all requests rather than blocking.                                                                                                                                        | `bool`         | `false`           | no          |
-| request_policy         | Managed request policy to associate with the distribution. See the [managed policies][managed-policies] for valid values.                                                                                           | `string`       | `"AllViewer"`     | no          |
-| subdomain              | Subdomain for the distribution. Defaults to the environment.                                                                                                                                                        | `string`       | n/a               | no          |
-| tags                   | Optional tags to be applied to all resources.                                                                                                                                                                       | `map(string)`  | `{}`              | no          |
-| [upload_paths]         | Optional paths to allow uploads to.                                                                                                                                                                                 | `list(object)` | `[]`              | no          |
-| upload_rules_capacity  | Capacity for the upload rules group. Attempts to determine the capacity if left empty.                                                                                                                              | `number`       | `null`            | no          |
-| use_custom_origin      | Use a custom origin configuration instead of an ALB origin. When set to `true`, a custom origin is used and `origin_alb_arn` is not required; when set to `false`, an ALB is used and `origin_alb_arn` must be set. | `bool`         | `false`           | no          |
-| [webhooks]             | Optional map of webhooks that should be allowed through the WAF.                                                                                                                                                    | `map(object)`  | `{}`              | no          |
-| webhooks_priority      | Priority for the webhooks rule group. By default, an attempt is made to place it before other rules that block traffic.                                                                                             | `number`       | `null`            | no          |
-| webhook_rules_capacity | Capacity for the webhook rules group. Attempts to determine the capacity if left empty.                                                                                                                             | `number`       | `null`            | no          |
+| Name                     | Description                                                                                                                                                                                                         | Type           | Default           | Required    |
+|--------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------|-------------------|-------------|
+| domain                   | Primary domain for the distribution. The hosted zone for this domain should be in the same account.                                                                                                                 | `string`       | n/a               | yes         |
+| log_bucket               | Domain name of the S3 bucket to send logs to.                                                                                                                                                                       | `string`       | n/a               | yes         |
+| log_group                | CloudWatch log group to send WAF logs to.                                                                                                                                                                           | `string`       | n/a               | yes         |
+| project                  | Project that these resources are supporting.                                                                                                                                                                        | `string`       | n/a               | yes         |
+| origin_alb_arn           | ARN of the Application Load Balancer this deployment will point to. Required unless `use_custom_origin` is set to `true`.                                                                                           | `string`       | n/a               | conditional |
+| certificate_domain       | Domain for the imported certificate, if different from the endpoint. Used in conjunction with `certificate_imported`.                                                                                               | `string`       | `null`            | no          |
+| certificate_imported     | Whether the certificate is imported or managed by ACM.                                                                                                                                                              | `bool`         | `false`           | no          |
+| [custom_headers]         | Custom headers to send to the origin.                                                                                                                                                                               | `map(string)`  | `{}`              | no          |
+| environment              | The environment for the deployment.                                                                                                                                                                                 | `string`       | `"development"`   | no          |
+| hosted_zone_id           | ID of the hosted zone for the domain, leave empty to have this module look it up.                                                                                                                                   | `string`       | `null`            | no          |
+| [ip_set_rules]           | Custom IP Set rules for the WAF                                                                                                                                                                                     | `map(object)`  | `{}`              | no          |
+| redacted_headers         | Headers to redact from logs. Keys are the header names, and values are the action to take. Valid actions are `"HASH"` and `"SUBSTITUTION"`.                                                                         | `map(string)`  | `{sane defaults}` | no          |
+| [rate_limit_rules]       | Rate limiting configuration for the WAF.                                                                                                                                                                            | `map(object)`  | `{}`              | no          |
+| [redirect_paths]         | Ordered cache behaviors for path-based redirects. Each entry attaches a CloudFront function that performs the redirect for requests matching the given path pattern.                                                | `list(object)` | `[]`              | no          |
+| origin_domain            | Optional custom origin domain to point to. Defaults to `origin.subdomain.domain`. Only used if `use_custom_origin` is set to `true`.                                                                                | `string`       | n/a               | no          |
+| passive                  | Enable passive mode for the WAF, counting all requests rather than blocking.                                                                                                                                        | `bool`         | `false`           | no          |
+| request_policy           | Managed request policy to associate with the distribution. See the [managed policies][managed-policies] for valid values.                                                                                           | `string`       | `"AllViewer"`     | no          |
+| subdomain                | Subdomain for the distribution. Defaults to the environment.                                                                                                                                                        | `string`       | n/a               | no          |
+| tags                     | Optional tags to be applied to all resources.                                                                                                                                                                       | `map(string)`  | `{}`              | no          |
+| [upload_paths]           | Optional paths to allow uploads to.                                                                                                                                                                                 | `list(object)` | `[]`              | no          |
+| upload_rules_capacity    | Capacity for the upload rules group. Attempts to determine the capacity if left empty.                                                                                                                              | `number`       | `null`            | no          |
+| use_custom_origin        | Use a custom origin configuration instead of an ALB origin. When set to `true`, a custom origin is used and `origin_alb_arn` is not required; when set to `false`, an ALB is used and `origin_alb_arn` must be set. | `bool`         | `false`           | no          |
+| [webhooks]               | Optional map of webhooks that should be allowed through the WAF.                                                                                                                                                    | `map(object)`  | `{}`              | no          |
+| webhooks_priority        | Priority for the webhooks rule group. By default, an attempt is made to place it before other rules that block traffic.                                                                                             | `number`       | `null`            | no          |
+| webhook_rules_capacity   | Capacity for the webhook rules group. Attempts to determine the capacity if left empty.                                                                                                                             | `number`       | `null`            | no          |
+| minimum_protocol_version | Minimum CloudWatch TLS security policy. Defaults to `"TLSv1.2_2025"`.                                                                                                                                               | `string`       | `"TLSv1.2_2025"`  | no          |
 
 ### custom_headers
 
@@ -244,7 +244,7 @@ resource "aws_wafv2_ip_set" "security_scanners" {
   description        = "Security scanners that are allowed to access the site."
   scope              = "CLOUDFRONT"
   ip_address_version = "IPV4"
-  addresses          = [
+  addresses = [
     "1.2.3.4/32",
     "5.6.7.8/32"
   ]
@@ -270,7 +270,7 @@ module "cloudfront_waf" {
 ```
 
 | Name     | Description                                                                 | Type     | Default   | Required |
-| -------- | --------------------------------------------------------------------------- | -------- | --------- | -------- |
+|----------|-----------------------------------------------------------------------------|----------|-----------|----------|
 | action   | The action to perform.                                                      | `string` | `"allow"` | no       |
 | arn      | ARN of the IP set to match on.                                              | `string` | n/a       | yes      |
 | name     | Name for this rule. Defaults to `${project}-${environment}-ip-${rule.key}`. | `string` | `null`    | no       |
@@ -309,7 +309,7 @@ module "cloudfront_waf" {
 ```
 
 | Name     | Description                                                                             | Type     | Default   | Required |
-| -------- | --------------------------------------------------------------------------------------- | -------- | --------- | -------- |
+|----------|-----------------------------------------------------------------------------------------|----------|-----------|----------|
 | action   | The action to perform.                                                                  | `string` | `"block"` | no       |
 | name     | Name for this rule. Defaults to `${project}-${environment}-rate-${rule.key}`.           | `string` | `null`    | no       |
 | limit    | The number of requests allowed within the window. Minimum value of 10.                  | `number` | `10`      | no       |
@@ -347,7 +347,7 @@ module "cloudfront_waf" {
 ```
 
 | Name         | Description                                                                    | Type     | Default | Required |
-| ------------ | ------------------------------------------------------------------------------ | -------- | ------- | -------- |
+|--------------|--------------------------------------------------------------------------------|----------|---------|----------|
 | path_pattern | CloudFront path pattern to match (e.g. `/old-path*`).                          | `string` | n/a     | yes      |
 | function_arn | ARN of the CloudFront function to fire on `viewer-request` for matching paths. | `string` | n/a     | yes      |
 
@@ -422,22 +422,26 @@ module "cloudfront_waf" {
 
   webhooks = {
     twilio = {
-      paths = [{
+      paths = [
+        {
           constraint = "EXACTLY"
-          path      = "/incoming_text_messages"
+          path       = "/incoming_text_messages"
         },
         {
           constraint = "STARTS_WITH"
-          path      = "/outgoing_text_messages/"
-      }]
+          path       = "/outgoing_text_messages/"
+        }
+      ]
       # Make sure the `x-twilio-signature` header is present and not empty.
-      criteria = [{
-        type       = "size"
-        constraint = "GT"
-        field      = "header"
-        name       = "x-twilio-signature"
-        value      = "0"
-      }]
+      criteria = [
+        {
+          type       = "size"
+          constraint = "GT"
+          field      = "header"
+          name       = "x-twilio-signature"
+          value      = "0"
+        }
+      ]
       action = "allow"
     }
   }
@@ -456,7 +460,7 @@ valid request. If no criteria are specified, any requests matching the paths
 will be allowed through.
 
 | Name                          | Description                                                                                            | Type           | Default   | Required |
-| ----------------------------- | ------------------------------------------------------------------------------------------------------ | -------------- | --------- | -------- |
+|-------------------------------|--------------------------------------------------------------------------------------------------------|----------------|-----------|----------|
 | [paths][webhooks.paths]       | The webhook paths for the service or function.                                                         | `list(object)` | n/a       | yes      |
 | action                        | The action to apply to requests matching the criteria. Valid values are `allow`, `block`, and `count`. | `string`       | `"allow"` | no       |
 | [criteria][webhooks.criteria] | Constraint to apply when testing for the path                                                          | `list(object)` | `[]`      | no       |
@@ -464,7 +468,7 @@ will be allowed through.
 #### criteria
 
 | Name       | Description                                                                                                                                                              | Type     | Default | Required  |
-| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------- | ------- | --------- |
+|------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------|---------|-----------|
 | field      | The field to apply the constraint to. Supported values are `header`, and `uri`.                                                                                          | `string` | n/a     | yes       |
 | type       | The type of statement for this criteria. Supported values are `byte` and `size`.                                                                                         | `string` | n/a     | yes       |
 | value      | The comparison value for the constraint.                                                                                                                                 | `string` | n/a     | yes       |
@@ -474,36 +478,64 @@ will be allowed through.
 #### paths
 
 | Name       | Description                                                                                                                              | Type     | Default     | Required |
-| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------- | -------- | ----------- | -------- |
+|------------|------------------------------------------------------------------------------------------------------------------------------------------|----------|-------------|----------|
 | path       | The path to match.                                                                                                                       | `string` | n/a         | yes      |
 | constraint | The constraint to apply when matching the path. Supported values are `EXACTLY`, `STARTS_WITH`, `ENDS_WITH`, `CONTAINS`, `CONTAINS_WORD`. | `string` | `"EXACTLY"` | no       |
 
 [acm]: https://aws.amazon.com/certificate-manager/
+
 [acm-import]: https://docs.aws.amazon.com/acm/latest/userguide/import-certificate.html
+
 [badge-release]: https://img.shields.io/github/v/release/codeforamerica/tofu-modules-aws-cloudfront-waf?logo=github&label=Latest%20Release
+
 [cloudfront-headers]: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/add-origin-custom-headers.html#add-origin-custom-headers-denylist
+
 [constraints]: https://docs.aws.amazon.com/waf/latest/APIReference/API_ByteMatchStatement.html
+
 [custom_headers]: #custom_headers
+
 [distribution]: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/distribution-working-with.html
+
 [evssl]: https://cabforum.org/working-groups/server/extended-validation/about/
+
 [file-false-positives]: https://repost.aws/knowledge-center/waf-upload-blocked-files
+
 [ip-rules]: https://docs.aws.amazon.com/waf/latest/developerguide/waf-rule-statement-type-ipset-match.html
+
 [ip_set_rules]: #ip_set_rules
+
 [latest-release]: https://github.com/codeforamerica/tofu-modules-aws-cloudfront-waf/releases/latest
+
 [managed-policies]: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-managed-origin-request-policies.html
+
 [cloudfront-redirect]: https://github.com/codeforamerica/tofu-modules-aws-cloudfront-redirect
+
 [ordered-behaviors]: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/distribution-web-values-specify.html#DownloadDistValuesPathPattern
+
 [rate_limit_rules]: #rate_limit_rules
+
 [redirect_paths]: #redirect_paths
+
 [route53]: https://aws.amazon.com/route53/
+
 [rules-common]: https://docs.aws.amazon.com/waf/latest/developerguide/aws-managed-rule-groups-baseline.html#aws-managed-rule-groups-baseline-crs
+
 [rules-inputs]: https://docs.aws.amazon.com/waf/latest/developerguide/aws-managed-rule-groups-baseline.html#aws-managed-rule-groups-baseline-known-bad-inputs
+
 [rules-ip-rep]: https://docs.aws.amazon.com/waf/latest/developerguide/aws-managed-rule-groups-ip-rep.html#aws-managed-rule-groups-ip-rep-amazon
+
 [rules-bot-control]: https://docs.aws.amazon.com/waf/latest/developerguide/aws-managed-rule-groups-bot-control.html
+
 [rules-sqli]: https://docs.aws.amazon.com/waf/latest/developerguide/aws-managed-rule-groups-use-case.html#aws-managed-rule-groups-use-case-sql-db
+
 [upload_paths]: #upload_paths
+
 [wafv2_ip_set]: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/wafv2_ip_set
+
 [wcus]: https://docs.aws.amazon.com/waf/latest/developerguide/limits.html
+
 [webhooks]: #webhooks
+
 [webhooks.paths]: #paths
+
 [webhooks.criteria]: #criteria
