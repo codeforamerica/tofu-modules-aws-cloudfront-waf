@@ -65,6 +65,8 @@ these rules are spaced out to allow for custom rules to be inserted between.
 | [AWSManagedRulesBotControlRuleSet][rules-bot-control] | 450      | (Optional, off by default) Protects against bots.     |
 | [AWSManagedRulesSQLiRuleSet][rules-sqli]              | 500      | Protects against SQL injection attacks.               |
 
+### Bot Control
+
 The bot control rule set can be enabled as follows, at either TARGETED or COMMON inspection level:
 
 ```hcl
