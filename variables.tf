@@ -107,13 +107,25 @@ variable "bot_control" {
   type = object({
     enable           = optional(bool, false)
     inspection_level = optional(string, "COMMON")
+    rule_actions     = optional(map(string), {})
   })
-  description = "Bot Control managed rule group configuration."
+  description = <<-EOT
+    Bot Control managed rule group configuration. `rule_actions` maps a Bot
+    Control sub-rule name (e.g. `CategoryAdvertising`, `TGT_VolumetricSession`)
+    to a custom action (`allow`, `block`, `captcha`, `challenge`, or `count`),
+    overriding AWS's default action for that sub-rule. Only sub-rules that belong
+    to the selected `inspection_level` can be overridden.
+    EOT
   default     = {}
 
   validation {
     condition     = contains(["COMMON", "TARGETED"], var.bot_control.inspection_level)
     error_message = "inspection_level must be either \"COMMON\" or \"TARGETED\"."
+  }
+
+  validation {
+    condition     = alltrue([for a in values(var.bot_control.rule_actions) : contains(["allow", "block", "captcha", "challenge", "count"], a)])
+    error_message = "Each rule_actions value must be one of \"allow\", \"block\", \"captcha\", \"challenge\", or \"count\"."
   }
 }
 
