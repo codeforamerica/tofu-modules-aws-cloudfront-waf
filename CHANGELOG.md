@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog][changelog], and this project adheres
 to [Semantic Versioning][semver].
 
+## 2.6.0 (2026-07-15)
+
+### Feat
+
+- Allow greater configruation of bot controls. [TEF-867] (#54)
+
+### Fix
+
+- Output the application integration URL. [TEF-935] (#55)
+
 ## 2.5.0 (2026-07-06)
 
 ### Feat
