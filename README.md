@@ -484,6 +484,12 @@ will be allowed through.
 | path       | The path to match.                                                                                                                       | `string` | n/a         | yes      |
 | constraint | The constraint to apply when matching the path. Supported values are `EXACTLY`, `STARTS_WITH`, `ENDS_WITH`, `CONTAINS`, `CONTAINS_WORD`. | `string` | `"EXACTLY"` | no       |
 
+## Outputs
+
+| Name                        | Description                                                                                        |
+|-----------------------------|----------------------------------------------------------------------------------------------------|
+| application_integration_url | URL for the AWS WAF application integration SDK (CAPTCHA/Challenge JavaScript API) for token minting. |
+
 [acm]: https://aws.amazon.com/certificate-manager/
 
 [acm-import]: https://docs.aws.amazon.com/acm/latest/userguide/import-certificate.html
