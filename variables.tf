@@ -20,6 +20,18 @@ variable "certificate_imported" {
   default     = false
 }
 
+variable "certificate_sans" {
+  type        = list(string)
+  description = <<-EOT
+    Additional subject alternative names for the managed ACM certificate. Use
+    this for wildcard names such as `*.example.org` when the origin ALB must
+    terminate TLS for hostnames beyond the primary distribution FQDN, including
+    ephemeral preview hosts. Names that match the primary FQDN are ignored.
+    Only applies when `certificate_imported` is `false`.
+    EOT
+  default     = []
+}
+
 variable "custom_headers" {
   type        = map(string)
   description = "Custom headers to send to the origin."
