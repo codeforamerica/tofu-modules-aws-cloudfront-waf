@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog][changelog], and this project adheres
 to [Semantic Versioning][semver].
 
+## 2.7.0 (2026-07-29)
+
+### Feat
+
+- Allow subject alternative names (SANs) to be configured on the created certificate. (#57)
+
 ## 2.6.0 (2026-07-15)
 
 ### Feat
