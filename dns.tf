@@ -13,8 +13,9 @@ resource "aws_route53_record" "subdomain" {
 resource "aws_acm_certificate" "subdomain" {
   # Specify the name rather than referencing the resource directly. This allows
   # us to create the certificate before the DNS record exists.
-  domain_name       = local.fqdn
-  validation_method = "DNS"
+  domain_name               = local.fqdn
+  subject_alternative_names = local.certificate_sans
+  validation_method         = "DNS"
 
   lifecycle {
     create_before_destroy = true
