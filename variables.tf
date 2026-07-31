@@ -25,9 +25,9 @@ variable "certificate_sans" {
   description = <<-EOT
     Additional subject alternative names for the managed ACM certificate. Use
     this for wildcard names such as `*.example.org` when the origin ALB must
-    terminate TLS for hostnames beyond the primary distribution FQDN, including
-    ephemeral preview hosts. Names that match the primary FQDN are ignored.
-    Only applies when `certificate_imported` is `false`.
+    terminate TLS for hostnames beyond the primary distribution FQDN. Names that
+    match the primary FQDN are ignored. Only applies when `certificate_imported`
+    is `false`.
     EOT
   default     = []
 }
@@ -42,6 +42,18 @@ variable "environment" {
   type        = string
   description = "Environment for the deployment."
   default     = "development"
+}
+
+variable "extra_aliases" {
+  type        = list(string)
+  description = <<-EOT
+    Additional CloudFront alternate domain names beyond the primary FQDN.
+    Use this for wildcard names such as `*.example.org` when the distribution
+    must accept hostnames other than the primary FQDN. Each alias must be
+    covered by the viewer certificate (see `certificate_sans`). Duplicates of
+    the primary FQDN are ignored.
+    EOT
+  default     = []
 }
 
 variable "hosted_zone_id" {
