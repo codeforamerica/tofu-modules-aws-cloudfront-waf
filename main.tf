@@ -2,7 +2,7 @@ resource "aws_cloudfront_distribution" "waf" {
   enabled         = true
   comment         = "Pass traffic through WAF before sending to the origin."
   is_ipv6_enabled = true
-  aliases         = [local.fqdn]
+  aliases         = local.aliases
   price_class     = "PriceClass_100"
   web_acl_id      = aws_wafv2_web_acl.waf.arn
 
