@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog][changelog], and this project adheres
 to [Semantic Versioning][semver].
 
+## 2.8.0 (2026-08-06)
+
+### Feat
+
+- Add option to include additiional aliases the distribution should serve. (#59)
+
 ## 2.7.0 (2026-07-29)
 
 ### Feat
