@@ -333,6 +333,67 @@ resource "aws_wafv2_web_acl" "waf" {
               }
             }
           }
+
+          # When excluded_paths are configured, scope Bot Control down so it
+          # does not evaluate requests whose URI path matches any excluded path.
+          # Bot Control's silent challenge can't run reliably on authenticated
+          # internal surfaces (e.g. /admin), so we skip it there while leaving
+          # every other rule (rate limiting, CommonRuleSet, etc.) in force.
+          dynamic "scope_down_statement" {
+            for_each = length(var.bot_control.excluded_paths) > 0 ? [true] : []
+
+            content {
+              not_statement {
+                statement {
+                  # A single path uses a bare byte_match; multiple paths must be
+                  # combined in an or_statement (which requires >= 2 children).
+                  dynamic "byte_match_statement" {
+                    for_each = length(var.bot_control.excluded_paths) == 1 ? [true] : []
+
+                    content {
+                      positional_constraint = var.bot_control.excluded_paths[0].constraint
+                      search_string         = var.bot_control.excluded_paths[0].path
+
+                      field_to_match {
+                        uri_path {}
+                      }
+
+                      text_transformation {
+                        priority = 0
+                        type     = "NONE"
+                      }
+                    }
+                  }
+
+                  dynamic "or_statement" {
+                    for_each = length(var.bot_control.excluded_paths) > 1 ? [true] : []
+
+                    content {
+                      dynamic "statement" {
+                        for_each = var.bot_control.excluded_paths
+
+                        content {
+                          byte_match_statement {
+                            positional_constraint = statement.value.constraint
+                            search_string         = statement.value.path
+
+                            field_to_match {
+                              uri_path {}
+                            }
+
+                            text_transformation {
+                              priority = 0
+                              type     = "NONE"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
         }
       }
 

@@ -132,6 +132,10 @@ variable "bot_control" {
     enable           = optional(bool, false)
     inspection_level = optional(string, "COMMON")
     rule_actions     = optional(map(string), {})
+    excluded_paths = optional(list(object({
+      constraint = optional(string, "STARTS_WITH")
+      path       = string
+    })), [])
   })
   description = <<-EOT
     Bot Control managed rule group configuration. `rule_actions` maps a Bot
@@ -139,6 +143,12 @@ variable "bot_control" {
     to a custom action (`allow`, `block`, `captcha`, `challenge`, or `count`),
     overriding AWS's default action for that sub-rule. Only sub-rules that belong
     to the selected `inspection_level` can be overridden.
+
+    `excluded_paths` scopes Bot Control down so it does not evaluate requests
+    whose URI path matches any of the given paths (default match is
+    `STARTS_WITH`). Use this to keep Bot Control off authenticated internal
+    surfaces (e.g. `/admin`) where the silent challenge cannot run reliably,
+    while all other rules (rate limiting, CommonRuleSet, etc.) still apply.
     EOT
   default     = {}
 
