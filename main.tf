@@ -1,9 +1,12 @@
 # CloudFront's own redirect-to-https response (issued before the request ever
 # reaches the origin) is only covered by this policy, not by headers the
-# origin sets. Managed-SimpleCORS doesn't include HSTS, so that redirect was
-# shipping with no Strict-Transport-Security header. `override = false` so the
-# origin's own HSTS header (e.g. Rails' `force_ssl`) always wins when a
-# response does reach it.
+# origin sets. Managed-SimpleCORS doesn't include security headers, so that
+# redirect was shipping with no Strict-Transport-Security, X-Frame-Options,
+# X-Content-Type-Options, Content-Security-Policy, or Cache-Control header.
+# Every header below is `override = false` so the origin's own value (e.g.
+# Rails' `force_ssl` and CSP config) always wins for responses that do reach
+# it; these settings only fill the gap for responses CloudFront generates
+# itself.
 resource "aws_cloudfront_response_headers_policy" "policy" {
   name = "${local.prefix}-response-headers"
 
@@ -30,6 +33,28 @@ resource "aws_cloudfront_response_headers_policy" "policy" {
       include_subdomains         = true
       preload                    = true
       override                   = false
+    }
+
+    frame_options {
+      frame_option = "SAMEORIGIN"
+      override     = false
+    }
+
+    content_type_options {
+      override = false
+    }
+
+    content_security_policy {
+      content_security_policy = "default-src 'none'; frame-ancestors 'none'"
+      override                = false
+    }
+  }
+
+  custom_headers_config {
+    items {
+      header   = "Cache-Control"
+      value    = "no-store"
+      override = false
     }
   }
 }
