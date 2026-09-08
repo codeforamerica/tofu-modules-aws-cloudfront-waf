@@ -20,10 +20,6 @@ data "aws_cloudfront_origin_request_policy" "policy" {
   name = "Managed-${var.request_policy}"
 }
 
-data "aws_cloudfront_response_headers_policy" "policy" {
-  name = "Managed-SimpleCORS"
-}
-
 data "aws_lb" "origin" {
   for_each = var.use_custom_origin ? toset([]) : toset(["this"])
 

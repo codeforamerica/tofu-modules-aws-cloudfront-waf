@@ -1,3 +1,39 @@
+# CloudFront's own redirect-to-https response (issued before the request ever
+# reaches the origin) is only covered by this policy, not by headers the
+# origin sets. Managed-SimpleCORS doesn't include HSTS, so that redirect was
+# shipping with no Strict-Transport-Security header. `override = false` so the
+# origin's own HSTS header (e.g. Rails' `force_ssl`) always wins when a
+# response does reach it.
+resource "aws_cloudfront_response_headers_policy" "policy" {
+  name = "${local.prefix}-response-headers"
+
+  cors_config {
+    access_control_allow_credentials = false
+    origin_override                  = false
+
+    access_control_allow_headers {
+      items = ["*"]
+    }
+
+    access_control_allow_methods {
+      items = ["GET", "HEAD"]
+    }
+
+    access_control_allow_origins {
+      items = ["*"]
+    }
+  }
+
+  security_headers_config {
+    strict_transport_security {
+      access_control_max_age_sec = 63072000
+      include_subdomains         = true
+      preload                    = true
+      override                   = false
+    }
+  }
+}
+
 resource "aws_cloudfront_distribution" "waf" {
   enabled         = true
   comment         = "Pass traffic through WAF before sending to the origin."
@@ -62,7 +98,7 @@ resource "aws_cloudfront_distribution" "waf" {
 
     cache_policy_id            = data.aws_cloudfront_cache_policy.policy.id
     origin_request_policy_id   = data.aws_cloudfront_origin_request_policy.policy.id
-    response_headers_policy_id = data.aws_cloudfront_response_headers_policy.policy.id
+    response_headers_policy_id = aws_cloudfront_response_headers_policy.policy.id
 
     viewer_protocol_policy = "redirect-to-https"
   }
