@@ -98,6 +98,33 @@ bot_control = {
 See the [AWS Bot Control rule groups documentation][rules-bot-control] for the full
 list of sub-rule names available at each inspection level.
 
+### Excluding paths from Bot Control
+
+Bot Control's silent challenge cannot run reliably on authenticated internal
+surfaces (e.g. `/admin`) because the challenge response flow is incompatible with
+session-based auth. Use `excluded_paths` to scope Bot Control down so it skips
+requests whose URI path matches any of the given paths. All other rules (rate
+limiting, CommonRuleSet, etc.) continue to apply to those paths.
+
+```hcl
+bot_control = {
+  enable           = true
+  inspection_level = "TARGETED"
+
+  excluded_paths = [
+    { path = "/admin" },                                        # STARTS_WITH by default
+    { path = "/api/internal", constraint = "STARTS_WITH" },
+    { path = "/health",       constraint = "EXACTLY" },
+  ]
+}
+```
+
+The `constraint` field accepts any [positional constraint][waf-positional-constraint]
+supported by AWS WAF (`STARTS_WITH`, `ENDS_WITH`, `EXACTLY`, `CONTAINS`,
+`CONTAINS_WORD`). It defaults to `STARTS_WITH`.
+
+[waf-positional-constraint]: https://docs.aws.amazon.com/waf/latest/APIReference/API_ByteMatchStatement.html
+
 ## SSL Certificates
 
 By default, this module will use [AWS Certificate Manager][acm] (ACM) to manage
