@@ -336,9 +336,6 @@ resource "aws_wafv2_web_acl" "waf" {
 
           # When excluded_paths are configured, scope Bot Control down so it
           # does not evaluate requests whose URI path matches any excluded path.
-          # Bot Control's silent challenge can't run reliably on authenticated
-          # internal surfaces (e.g. /admin), so we skip it there while leaving
-          # every other rule (rate limiting, CommonRuleSet, etc.) in force.
           dynamic "scope_down_statement" {
             for_each = length(var.bot_control.excluded_paths) > 0 ? [true] : []
 
