@@ -131,10 +131,13 @@ variable "bot_control" {
   type = object({
     enable           = optional(bool, false)
     inspection_level = optional(string, "COMMON")
+    version          = optional(string, null)
     rule_actions     = optional(map(string), {})
   })
   description = <<-EOT
-    Bot Control managed rule group configuration. `rule_actions` maps a Bot
+    Bot Control managed rule group configuration. `version` pins a static
+    version of the rule group (e.g. `Version_8.0`); when unset, AWS's default
+    version is used. `rule_actions` maps a Bot
     Control sub-rule name (e.g. `CategoryAdvertising`, `TGT_VolumetricSession`)
     to a custom action (`allow`, `block`, `captcha`, `challenge`, or `count`),
     overriding AWS's default action for that sub-rule. Only sub-rules that belong
