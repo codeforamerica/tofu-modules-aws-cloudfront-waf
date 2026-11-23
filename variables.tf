@@ -151,6 +151,11 @@ variable "bot_control" {
   }
 
   validation {
+    condition     = var.bot_control.version == null || can(regex("^Version_[0-9]+\\.[0-9]+$", var.bot_control.version))
+    error_message = "version must be null or match \"Version_<major>.<minor>\" (e.g. \"Version_8.0\")."
+  }
+
+  validation {
     condition     = alltrue([for a in values(var.bot_control.rule_actions) : contains(["allow", "block", "captcha", "challenge", "count"], a)])
     error_message = "Each rule_actions value must be one of \"allow\", \"block\", \"captcha\", \"challenge\", or \"count\"."
   }
@@ -182,7 +187,7 @@ variable "rate_limit_rules" {
 }
 
 variable "redacted_headers" {
-  type = map(string)
+  type        = map(string)
   description = <<-EOT
     Headers to redact from logs. Keys are the header names, and values are the
     action to take. Valid actions are `"HASH"` and `"SUBSTITUTION"`.
