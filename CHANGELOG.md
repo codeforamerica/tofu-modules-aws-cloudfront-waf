@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog][changelog], and this project adheres
 to [Semantic Versioning][semver].
 
+## 2.9.0 (2026-11-24)
+
+### Feat
+
+- Allow pinning the Bot Control rule group version. (#63)
+
 ## 2.8.0 (2026-08-06)
 
 ### Feat
