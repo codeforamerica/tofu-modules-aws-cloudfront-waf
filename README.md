@@ -76,6 +76,20 @@ bot_control = {
 }
 ```
 
+By default, the rule group follows AWS's default version, which AWS changes over
+time. To pin a static version instead, set `version`:
+
+```hcl
+bot_control = {
+  enable           = true
+  inspection_level = "TARGETED"
+  version          = "Version_8.0"
+}
+```
+
+Sub-rule names and default actions differ between versions, so review
+`rule_actions` against the [changelog][rules-changelog] when changing versions.
+
 By default, every Bot Control sub-rule uses AWS's built-in action (block for most
 signals). To set a custom action per sub-rule instead (`allow`, `block`, `captcha`,
 `challenge`, or `count`), use `rule_actions`. This is useful for gradually
@@ -535,6 +549,8 @@ will be allowed through.
 [rules-ip-rep]: https://docs.aws.amazon.com/waf/latest/developerguide/aws-managed-rule-groups-ip-rep.html#aws-managed-rule-groups-ip-rep-amazon
 
 [rules-bot-control]: https://docs.aws.amazon.com/waf/latest/developerguide/aws-managed-rule-groups-bot-control.html
+
+[rules-changelog]: https://docs.aws.amazon.com/waf/latest/developerguide/aws-managed-rule-groups-changelog.html
 
 [rules-sqli]: https://docs.aws.amazon.com/waf/latest/developerguide/aws-managed-rule-groups-use-case.html#aws-managed-rule-groups-use-case-sql-db
 

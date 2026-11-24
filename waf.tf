@@ -290,6 +290,7 @@ resource "aws_wafv2_web_acl" "waf" {
         managed_rule_group_statement {
           name        = "AWSManagedRulesBotControlRuleSet"
           vendor_name = "AWS"
+          version     = var.bot_control.version
 
           managed_rule_group_configs {
             aws_managed_rules_bot_control_rule_set {

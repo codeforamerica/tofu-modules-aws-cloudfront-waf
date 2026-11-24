@@ -131,10 +131,13 @@ variable "bot_control" {
   type = object({
     enable           = optional(bool, false)
     inspection_level = optional(string, "COMMON")
+    version          = optional(string, null)
     rule_actions     = optional(map(string), {})
   })
   description = <<-EOT
-    Bot Control managed rule group configuration. `rule_actions` maps a Bot
+    Bot Control managed rule group configuration. `version` pins a static
+    version of the rule group (e.g. `Version_8.0`); when unset, AWS's default
+    version is used. `rule_actions` maps a Bot
     Control sub-rule name (e.g. `CategoryAdvertising`, `TGT_VolumetricSession`)
     to a custom action (`allow`, `block`, `captcha`, `challenge`, or `count`),
     overriding AWS's default action for that sub-rule. Only sub-rules that belong
@@ -145,6 +148,11 @@ variable "bot_control" {
   validation {
     condition     = contains(["COMMON", "TARGETED"], var.bot_control.inspection_level)
     error_message = "inspection_level must be either \"COMMON\" or \"TARGETED\"."
+  }
+
+  validation {
+    condition     = var.bot_control.version == null || can(regex("^Version_[0-9]+\\.[0-9]+$", var.bot_control.version))
+    error_message = "version must be null or match \"Version_<major>.<minor>\" (e.g. \"Version_8.0\")."
   }
 
   validation {
@@ -179,7 +187,7 @@ variable "rate_limit_rules" {
 }
 
 variable "redacted_headers" {
-  type = map(string)
+  type        = map(string)
   description = <<-EOT
     Headers to redact from logs. Keys are the header names, and values are the
     action to take. Valid actions are `"HASH"` and `"SUBSTITUTION"`.
